@@ -1,4 +1,6 @@
-module Salt
+module Proxy::Salt
+  class NotFound < RuntimeError; end
+
   class Plugin < ::Proxy::Plugin
     plugin 'salt', ::Salt::VERSION
 
