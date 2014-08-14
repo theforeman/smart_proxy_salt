@@ -1,17 +1,14 @@
-#lib = File.expand_path('../lib', __FILE__)
-#$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-#require 'smart_proxy_salt/version'
+require File.expand_path('../lib/smart_proxy_salt/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.name = 'smart_proxy_salt'
-  s.version = '0.0.1'
-#  s.version = Proxy::Salt::VERSION
+  s.version = Proxy::Salt::VERSION
 
   s.summary = "SaltStack Plug-In for Foreman's Smart Proxy"
   s.description = "SaltStack Plug-In for Foreman's Smart Proxy"
   s.authors = ['Michael Moll', 'Stephen Benjamin']
   s.email = 'foreman-dev@googlegroups.com'
-  s.files = Dir['{lib,settings.d,bundler.d}/**/*'] + ['README', 'LICENSE']
+  s.files = Dir['{lib,settings.d,bundler.d}/**/*'] + ['README.md', 'LICENSE']
   s.homepage = 'http://github.com/stbenjam/smart-proxy_salt'
   s.license = 'GPLv3'
 end
