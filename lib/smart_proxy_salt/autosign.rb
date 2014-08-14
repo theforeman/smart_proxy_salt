@@ -15,7 +15,9 @@ module Proxy::Salt
       autosign.puts host if found == false
       autosign.close
 
-      logger.info "Added #{host} to autosign"
+      result = {:message => "Added #{host} to autosign"}
+      logger.info result[:message]
+      result
     end
 
     def remove host
@@ -35,7 +37,9 @@ module Proxy::Salt
         autosign.write entries.join("\n")
         autosign.write "\n"
         autosign.close
-        logger.info "Removed #{host} from autosign"
+        result = {:message => "Removed #{host} from autosign"}
+        logger.info result[:message]
+        result
       else
         logger.info "Attempt to remove nonexistant client autosign for #{host}"
         raise Proxy::Salt::NotFound, "Attempt to remove nonexistant client autosign for #{host}"
