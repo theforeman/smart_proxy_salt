@@ -74,8 +74,13 @@ module Proxy::Salt
     end
 
     def highstate host
-      cmd = [which("sudo"), "-u", Proxy::Salt::Plugin.settings.saltrun_user, which("salt"), "'#{escape_for_shell(host)}'", "state.highstate"]
+      cmd = [which("sudo"), "-u", Proxy::Salt::Plugin.settings.salt_command_user, which("salt"), "--async", "'#{escape_for_shell(host)}'", "state.highstate"]
       logger.info "Will run state.highstate for #{host}. Full command: #{cmd.join(" ")}"
+      shell_command(cmd)
+    end
+
+    def key_delete host
+      cmd = [which("sudo"), "-u", Proxy::Salt::Plugin.settings.salt_command_user, which("salt-key"), '--yes', '-d', escape_for_shell(host)]
       shell_command(cmd)
     end
   end

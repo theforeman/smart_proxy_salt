@@ -30,9 +30,19 @@ module Proxy::Salt
     post "/highstate/:host" do
       content_type :json
       begin
-        log_halt 500, "Failed salt run for #{params[:host]}: Check Log files" unless Proxy::Salt.highstate(params[:host]).to_json
+        log_halt 500, "Failed salt run for #{params[:host]}: Check Log files" unless result=Proxy::Salt.highstate(params[:host])
+        result
       rescue => e
         log_halt 406, "Failed salt run for #{params[:host]}: #{e}"
+      end
+    end
+
+    delete "/key/:host" do
+      content_type :json
+      begin
+        Proxy::Salt.key_delete(params[:host])
+      rescue => e
+        log_halt 406, "Failed delete salt key for #{params[:host]}: #{e}"
       end
     end
   end
