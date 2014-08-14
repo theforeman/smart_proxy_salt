@@ -1,0 +1,3 @@
+---
+:enabled: true
+:autosign_file: /etc/salt/autosign.conf
