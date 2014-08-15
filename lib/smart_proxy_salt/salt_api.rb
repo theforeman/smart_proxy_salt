@@ -45,5 +45,24 @@ module Proxy::Salt
         log_halt 406, "Failed delete salt key for #{params[:host]}: #{e}"
       end
     end
+
+    post "/key/:host" do
+      content_type :json
+      begin
+        Proxy::Salt::key_accept(params[:host])
+      rescue => e
+        log_halt 406, "Failed to accept salt key for #{params[:host]}: #{e}"
+      end
+    end
+
+    get "/key" do
+      content_type :json
+      begin
+        Proxy::Salt::key_list.to_json
+      rescue => e
+        log_halt 406, "Failed to list keys: #{e}"
+      end
+    end
+
   end
 end
