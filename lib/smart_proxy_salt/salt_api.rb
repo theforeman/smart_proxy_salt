@@ -1,3 +1,4 @@
+require 'proxy/request'
 require 'sinatra'
 require 'smart_proxy_salt/salt'
 require 'smart_proxy_salt/salt_main'
@@ -82,5 +83,16 @@ module Proxy::Salt
       end
     end
 
+    post "/returner/:host" do
+      content_type :json
+      begin
+        content = JSON.load(request.body)
+        if content.key? 'grains'
+          Proxy::HttpRequest::Facts.new.post_facts(JSON.pretty_generate(content['grains']))
+        end
+      rescue => e
+        log_halt 406, "Failed to parse facts for #{params[:host]}: #{e}"
+      end
+    end
   end
 end
