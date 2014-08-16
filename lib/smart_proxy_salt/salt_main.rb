@@ -74,14 +74,75 @@ module Proxy::Salt
     end
 
     def highstate host
-      cmd = [which("sudo"), "-u", Proxy::Salt::Plugin.settings.salt_command_user, which("salt"), "--async", "'#{escape_for_shell(host)}'", "state.highstate"]
+      find_salt_binaries
+      cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt, "--async", "'#{escape_for_shell(host)}'", "state.highstate"]
       logger.info "Will run state.highstate for #{host}. Full command: #{cmd.join(" ")}"
       shell_command(cmd)
     end
 
     def key_delete host
-      cmd = [which("sudo"), "-u", Proxy::Salt::Plugin.settings.salt_command_user, which("salt-key"), '--yes', '-d', escape_for_shell(host)]
+      find_salt_binaries
+      cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt_key, '--yes', '-d', escape_for_shell(host)]
       shell_command(cmd)
     end
+
+    def key_accept host
+      find_salt_binaries
+      cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt_key, '--yes', '-a', escape_for_shell(host)]
+      shell_command(cmd)
+    end
+
+    def key_list
+
+      find_salt_binaries
+      command = "#{@sudo} -u #{Proxy::Salt::Plugin.settings.salt_command_user} #{@salt_key} --finger-all --output=json"
+      logger.debug "Executing #{command}"
+      response = `#{command}`
+      unless $? == 0
+        logger.warn "Failed to run salt-key: #{response}"
+        raise "Execution of salt-key failed, check log files"
+      end
+
+      keys_hash = {}
+
+      sk_hash = JSON.parse(response)
+
+      accepted_minions = sk_hash['minions']
+      accepted_minions.keys.each { | accepted_minion | keys_hash[accepted_minion] = { 'state' => 'accepted', 'fingerprint' => accepted_minions[accepted_minion]} } if sk_hash.key? 'minions'
+
+      rejected_minions = sk_hash['minions_rejected']
+      rejected_minions.keys.each { | rejected_minion | keys_hash[rejected_minion] = { 'state' => 'rejected', 'fingerprint' => rejected_minions[rejected_minion] } } if sk_hash.key? 'minions_rejected'
+
+      unaccepted_minions = sk_hash['minions_pre']
+      unaccepted_minions.keys.each { | unaccepted_minion | keys_hash[unaccepted_minion] = { 'state' => 'unaccepted', 'fingerprint' => unaccepted_minions[unaccepted_minion] } } if sk_hash.key? 'minions_pre'
+
+      keys_hash
+
+    end
+
+    def find_salt_binaries
+      @salt_key = which('salt-key')
+      unless File.exists?("#{@salt_key}")
+        logger.warn 'unable to find salt-key binary'
+        raise 'unable to find salt-key'
+      end
+      logger.debug "Found salt-key at #{@salt_key}"
+
+      @salt = which('salt')
+      unless File.exists?("#{@salt}")
+        logger.warn 'unable to find salt binary'
+        raise 'unable to find salt'
+      end
+      logger.debug "Found salt-key at #{@salt_key}"
+
+      @sudo = which('sudo')
+      unless File.exists?(@sudo)
+        logger.warn 'unable to find sudo binary'
+        raise 'Unable to find sudo'
+      end
+      logger.debug "Found sudo at #{@sudo}"
+      @sudo = "#{@sudo} -S"
+    end
+
   end
 end
