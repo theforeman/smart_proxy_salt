@@ -73,6 +73,15 @@ module Proxy::Salt
       end
     end
 
+    def autosign_list
+      return [] unless File.exist?(autosign_file)
+      File.read(autosign_file).split("\n").reject { |v|
+        v =~ /^\s*#.*|^$/ ## Remove comments and empty lines
+      }.map { |v|
+        v.chomp ## Strip trailing spaces
+      }
+    end
+
     def highstate host
       find_salt_binaries
       cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt, "--async", "'#{escape_for_shell(host)}'", "state.highstate"]
@@ -83,6 +92,12 @@ module Proxy::Salt
     def key_delete host
       find_salt_binaries
       cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt_key, '--yes', '-d', escape_for_shell(host)]
+      shell_command(cmd)
+    end
+
+    def key_reject host
+      find_salt_binaries
+      cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt_key, '--yes', '-r', escape_for_shell(host)]
       shell_command(cmd)
     end
 
@@ -141,7 +156,7 @@ module Proxy::Salt
         raise 'Unable to find sudo'
       end
       logger.debug "Found sudo at #{@sudo}"
-      @sudo = "#{@sudo} -S"
+      @sudo = "#{@sudo}"
     end
 
   end

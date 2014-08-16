@@ -27,6 +27,15 @@ module Proxy::Salt
       end
     end
 
+    get "/autosign" do
+      content_type :json
+      begin
+        Proxy::Salt::autosign_list.to_json
+      rescue => e
+        log_halt 406, "Failed to list autosign entries: #{e}"
+      end
+    end
+
     post "/highstate/:host" do
       content_type :json
       begin
@@ -52,6 +61,15 @@ module Proxy::Salt
         Proxy::Salt::key_accept(params[:host])
       rescue => e
         log_halt 406, "Failed to accept salt key for #{params[:host]}: #{e}"
+      end
+    end
+
+    delete "/key/reject/:host" do
+      content_type :json
+      begin
+        Proxy::Salt::key_reject(params[:host])
+      rescue => e
+        log_halt 406, "Failed to reject salt key for #{params[:host]}: #{e}"
       end
     end
 
