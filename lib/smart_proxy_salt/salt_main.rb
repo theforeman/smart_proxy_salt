@@ -148,7 +148,7 @@ module Proxy::Salt
         logger.warn 'unable to find salt binary'
         raise 'unable to find salt'
       end
-      logger.debug "Found salt-key at #{@salt_key}"
+      logger.debug "Found salt at #{@salt}"
 
       @sudo = which('sudo')
       unless File.exists?(@sudo)
