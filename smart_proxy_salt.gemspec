@@ -8,7 +8,8 @@ Gem::Specification.new do |s|
   s.description = "SaltStack Plug-In for Foreman's Smart Proxy"
   s.authors = ['Michael Moll', 'Stephen Benjamin']
   s.email = 'foreman-dev@googlegroups.com'
-  s.files = Dir['{lib,settings.d,bundler.d}/**/*'] + ['README.md', 'LICENSE']
+  s.extra_rdoc_files = ['README.md', 'LICENSE']
+  s.files = Dir['{lib,settings.d,bundler.d}/**/*'] + s.extra_rdoc_files
   s.homepage = 'https://github.com/theforeman/smart_proxy_salt'
   s.license = 'GPLv3'
 end
