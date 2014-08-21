@@ -9,6 +9,6 @@ Gem::Specification.new do |s|
   s.authors = ['Michael Moll', 'Stephen Benjamin']
   s.email = 'foreman-dev@googlegroups.com'
   s.files = Dir['{lib,settings.d,bundler.d}/**/*'] + ['README.md', 'LICENSE']
-  s.homepage = 'http://github.com/stbenjam/smart-proxy_salt'
+  s.homepage = 'https://github.com/theforeman/smart_proxy_salt'
   s.license = 'GPLv3'
 end
