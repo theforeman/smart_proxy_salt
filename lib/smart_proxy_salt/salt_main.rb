@@ -13,6 +13,7 @@ module Proxy::Salt
           return 0
         end
         Process.wait(c.pid)
+	logger.info("Result: #{c.read}")
       rescue Exception => e
         logger.error("Exception '#{e}' when executing '#{cmd}'")
         return false
@@ -84,7 +85,7 @@ module Proxy::Salt
 
     def highstate host
       find_salt_binaries
-      cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt, "--async", "'#{escape_for_shell(host)}'", "state.highstate"]
+      cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt, "--async", escape_for_shell(host), "state.highstate"]
       logger.info "Will run state.highstate for #{host}. Full command: #{cmd.join(" ")}"
       shell_command(cmd)
     end
