@@ -1,0 +1,5 @@
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# Check every 10 minutes for new Salt reports to upload to Foreman
+*/10 * * * * root /usr/sbin/upload-salt-reports >>/var/log/foreman-proxy/salt-cron.log 2>&1
