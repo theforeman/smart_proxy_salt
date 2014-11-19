@@ -1,0 +1,130 @@
+#!/usr/bin/env python
+# Uploads reports from the Salt job cache to Foreman
+
+LAST_UPLOADED = '/etc/salt/last_uploaded'
+FOREMAN_CONFIG = '/etc/salt/foreman.yaml'
+LOCK_FILE = '/var/lock/salt-report-upload.lock'
+
+import urllib
+import httplib
+import json
+import yaml
+import os
+import sys
+
+import salt.config
+import salt.runner
+
+
+def salt_config():
+    with open(FOREMAN_CONFIG, 'r') as f:
+        config = yaml.load(f.read())
+    return config
+
+
+def get_job(job_id):
+    return {'job':
+             {
+               'result': run('jobs.lookup_jid', argument=[job_id]),
+               'function': 'state.highstate',
+               'job_id': job_id
+             }
+           }
+
+
+def read_last_uploaded():
+    if not os.path.isfile(LAST_UPLOADED):
+        return 0
+    else:
+        with open(LAST_UPLOADED, 'r') as f:
+            result = f.read().strip()
+        if len(result) == 20:
+            try:
+                return int(result)
+            except ValueError:
+                return 0
+        else:
+            return 0
+
+
+def write_last_uploaded(last_uploaded):
+    with open(LAST_UPLOADED, 'w+') as f:
+        f.write(last_uploaded)
+
+
+def run(function, argument={}):
+    __opts__ = salt.config.master_config(
+            os.environ.get('SALT_MASTER_CONFIG', '/etc/salt/master'))
+
+    runner = salt.runner.Runner(__opts__)
+    stdout_bak = sys.stdout
+    with open(os.devnull, 'wb') as f:
+        sys.stdout = f
+        ret = runner.cmd(function, argument)
+    sys.stdout = stdout_bak
+    return ret
+
+
+def jobs_to_upload():
+    jobs = run('jobs.list_jobs')
+    last_uploaded = read_last_uploaded()
+
+    job_ids = [id for (id, value) in jobs.iteritems()
+            if value['Function'] == 'state.highstate' and
+            int(id) > last_uploaded]
+
+    jobs = dict([(job, get_job(job)) for job in job_ids])
+    ids = sorted(jobs.keys())
+
+    return (ids, jobs)
+
+
+def upload(jobs):
+    config = salt_config()
+    headers = {'Accept': 'application/json',
+               'Content-Type': 'application/json'}
+
+    if config[':proto'] == 'https':
+        connection = httplib.HTTPSConnection(config[':host'],
+                port=config[':port'], key_file=config[':ssl_key'],
+                cert_file=config[':ssl_cert'])
+    else:
+        connection = httplib.HTTPConnection(config[':host'],
+                port=config[':port'])
+
+    for id in jobs[0]:
+        job = jobs[1][id]
+
+        if job['job']['result'] == {}:
+            continue
+
+        connection.request('POST', '/salt/api/v2/jobs/upload',
+                json.dumps(job), headers)
+        response = connection.getresponse()
+
+        if response.status == 200:
+            write_last_uploaded(id)
+            print "Success %s: %s" % (id, response.read())
+        else:
+            print "Unable to upload job - aborting report upload"
+            print response.read()
+
+
+def get_lock():
+    if os.path.isfile(LOCK_FILE):
+        raise Exception("Unable to obtain lock.")
+    else:
+        open(LOCK_FILE, 'w+').close()
+
+
+def release_lock():
+    if os.path.isfile(LOCK_FILE):
+        os.remove(LOCK_FILE)
+
+if __name__ == '__main__':
+    try:
+        get_lock()
+        upload(jobs_to_upload())
+        release_lock()
+    except:
+        release_lock()
