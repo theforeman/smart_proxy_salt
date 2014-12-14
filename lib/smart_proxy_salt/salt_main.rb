@@ -33,14 +33,14 @@ module Proxy::Salt
       Proxy::Salt::Plugin.settings.autosign_file
     end
 
-    def autosign_create host
+    def autosign_create(host)
       FileUtils.touch(autosign_file) unless File.exist?(autosign_file)
 
       autosign = open(autosign_file, File::RDWR)
 
       found = false
       autosign.each_line { |line| found = true if line.chomp == host }
-      autosign.puts host if found == false
+      autosign.puts host unless found
       autosign.close
 
       result = {:message => "Added #{host} to autosign"}
@@ -48,7 +48,7 @@ module Proxy::Salt
       result
     end
 
-    def autosign_remove host
+    def autosign_remove(host)
       raise "No such file #{autosign_file}" unless File.exists?(autosign_file)
 
       found = false
@@ -83,26 +83,26 @@ module Proxy::Salt
       }
     end
 
-    def highstate host
+    def highstate(host)
       find_salt_binaries
-      cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt, "--async", escape_for_shell(host), "state.highstate"]
-      logger.info "Will run state.highstate for #{host}. Full command: #{cmd.join(" ")}"
+      cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt, '--async', escape_for_shell(host), 'state.highstate']
+      logger.info "Will run state.highstate for #{host}. Full command: #{cmd.join(' ')}"
       shell_command(cmd)
     end
 
-    def key_delete host
+    def key_delete(host)
       find_salt_binaries
       cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt_key, '--yes', '-d', escape_for_shell(host)]
       shell_command(cmd)
     end
 
-    def key_reject host
+    def key_reject(host)
       find_salt_binaries
       cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt_key, '--yes', '-r', escape_for_shell(host)]
       shell_command(cmd)
     end
 
-    def key_accept host
+    def key_accept(host)
       find_salt_binaries
       cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt_key, '--yes', '-a', escape_for_shell(host)]
       shell_command(cmd)
@@ -116,7 +116,7 @@ module Proxy::Salt
       response = `#{command}`
       unless $? == 0
         logger.warn "Failed to run salt-key: #{response}"
-        raise "Execution of salt-key failed, check log files"
+        raise 'Execution of salt-key failed, check log files'
       end
 
       keys_hash = {}

@@ -7,7 +7,7 @@ module Proxy::Salt
     include ::Proxy::Log
     helpers ::Proxy::Helpers
 
-    post "/autosign/:host" do
+    post '/autosign/:host' do
       content_type :json
       begin
         Proxy::Salt.autosign_create(params[:host]).to_json
@@ -16,7 +16,7 @@ module Proxy::Salt
       end
     end
 
-    delete "/autosign/:host" do
+    delete '/autosign/:host' do
       content_type :json
       begin
         Proxy::Salt.autosign_remove(params[:host]).to_json
@@ -27,7 +27,7 @@ module Proxy::Salt
       end
     end
 
-    get "/autosign" do
+    get '/autosign' do
       content_type :json
       begin
         Proxy::Salt::autosign_list.to_json
@@ -36,17 +36,17 @@ module Proxy::Salt
       end
     end
 
-    post "/highstate/:host" do
+    post '/highstate/:host' do
       content_type :json
       begin
-        log_halt 500, "Failed salt run for #{params[:host]}: Check Log files" unless result=Proxy::Salt.highstate(params[:host])
+        log_halt 500, "Failed salt run for #{params[:host]}: Check Log files" unless (result = Proxy::Salt.highstate(params[:host]))
         result
       rescue => e
         log_halt 406, "Failed salt run for #{params[:host]}: #{e}"
       end
     end
 
-    delete "/key/:host" do
+    delete '/key/:host' do
       content_type :json
       begin
         Proxy::Salt.key_delete(params[:host])
@@ -55,7 +55,7 @@ module Proxy::Salt
       end
     end
 
-    post "/key/:host" do
+    post '/key/:host' do
       content_type :json
       begin
         Proxy::Salt::key_accept(params[:host])
@@ -64,7 +64,7 @@ module Proxy::Salt
       end
     end
 
-    delete "/key/reject/:host" do
+    delete '/key/reject/:host' do
       content_type :json
       begin
         Proxy::Salt::key_reject(params[:host])
@@ -73,7 +73,7 @@ module Proxy::Salt
       end
     end
 
-    get "/key" do
+    get '/key' do
       content_type :json
       begin
         Proxy::Salt::key_list.to_json

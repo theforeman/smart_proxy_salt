@@ -5,7 +5,7 @@
 
 require 'yaml'
 
-$settings_file = "/etc/salt/foreman.yaml"
+$settings_file = '/etc/salt/foreman.yaml'
 SETTINGS = YAML.load_file($settings_file)
 
 require 'net/http'
@@ -22,7 +22,7 @@ rescue LoadError
     require 'rubygems' rescue nil
     require 'json'
   rescue LoadError => e
-    puts "You need the `json` gem to use the Foreman ENC script"
+    puts 'You need the `json` gem to use the Foreman ENC script'
     # code 1 is already used below
     exit 2
   end
@@ -32,7 +32,7 @@ def foreman_url
   "#{SETTINGS[:proto]}://#{SETTINGS[:host]}:#{SETTINGS[:port]}"
 end
 
-def valid_hostname? hostname
+def valid_hostname?(hostname)
   hostname =~ /\A(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\z/
 end
 
@@ -53,7 +53,7 @@ def get_grains(minion)
   end
 end
 
-def plain_grains minion
+def plain_grains(minion)
   # We have to get the grains from the cache, because the client
   # is probably running 'state.highstate' right now.
   #
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     print json.dumps(ret)
 EOF
 
-  result = IO.popen("python", mode='r+') do |python|
+  result = IO.popen('python', mode='r+') do |python|
     python.write script
     python.close_write
     result = python.read
@@ -169,15 +169,15 @@ def enc(minion)
 
   res = http.start { |http| http.request(req) }
 
-  raise "Error retrieving node #{minion}: #{res.class}\nCheck Foreman's /var/log/foreman/production.log for more information." unless res.code == "200"
+  raise "Error retrieving node #{minion}: #{res.class}\nCheck Foreman's /var/log/foreman/production.log for more information." unless res.code == '200'
   res.body
 end
 
-minion = ARGV[0] || raise("Must provide minion as an argument")
+minion = ARGV[0] || raise('Must provide minion as an argument')
 
-raise "Invalid hostname" unless valid_hostname? minion
+raise 'Invalid hostname' unless valid_hostname? minion
 begin
-  result = ""
+  result = ''
 
   if SETTINGS[:upload_grains]
     timeout(SETTINGS[:timeout]) do
