@@ -6,6 +6,7 @@ module Proxy::Salt
   class Api < ::Sinatra::Base
     include ::Proxy::Log
     helpers ::Proxy::Helpers
+    authorize_with_ssl_client
 
     post '/autosign/:host' do
       content_type :json
