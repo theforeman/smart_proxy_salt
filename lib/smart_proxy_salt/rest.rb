@@ -7,7 +7,7 @@ module Proxy::Salt::Rest
 
   class << self
     def environments_list
-      Proxy::Salt::ApiRequest.new.post('/run', :fun => 'fileserver.envs', :client => 'runner')['return'][0].to_s
+      JSON.dump(Proxy::Salt::ApiRequest.new.post('/run', :fun => 'fileserver.envs', :client => 'runner')['return'][0])
     end
 
     def states_list(environment)
@@ -25,7 +25,7 @@ module Proxy::Salt::Rest
         end
       end
 
-      states.to_s
+      JSON.dump(states)
     end
   end
 end
