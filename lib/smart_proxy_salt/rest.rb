@@ -18,10 +18,10 @@ module Proxy::Salt::Rest
 
       files.each do |file|
         if file =~ /\.sls\Z/ && file != "top.sls"
-          states << file.gsub('.sls', '')
-                        .gsub('/init', '')
-                        .chomp('/')
-                        .gsub('/', '.')
+          states << file.gsub('.sls', '').
+                         gsub('/init', '').
+                         chomp('/').
+                         gsub('/', '.')
         end
       end
 
