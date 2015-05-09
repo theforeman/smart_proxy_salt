@@ -1,34 +1,8 @@
-module Proxy::Salt
+module Proxy::Salt::CLI
   extend ::Proxy::Log
   extend ::Proxy::Util
 
   class << self
-
-    # Move these to a util thingy later
-    def shell_command(cmd, wait = true)
-      begin
-        c = popen(cmd)
-        unless wait
-          Process.detach(c.pid)
-          return 0
-        end
-        Process.wait(c.pid)
-	logger.info("Result: #{c.read}")
-      rescue Exception => e
-        logger.error("Exception '#{e}' when executing '#{cmd}'")
-        return false
-      end
-      logger.warn("Non-null exit code when executing '#{cmd}'") if $?.exitstatus != 0
-      $?.exitstatus == 0
-    end
-
-    def popen(cmd)
-      # 1.8.7 note: this assumes that cli options are space-separated
-      cmd = cmd.join(' ') unless RUBY_VERSION > '1.8.7'
-      logger.debug("about to execute: #{cmd}")
-      IO.popen(cmd)
-    end
-
     def autosign_file
       Proxy::Salt::Plugin.settings.autosign_file
     end
@@ -136,6 +110,32 @@ module Proxy::Salt
 
     end
 
+    private
+
+    def shell_command(cmd, wait = true)
+      begin
+        c = popen(cmd)
+        unless wait
+          Process.detach(c.pid)
+          return 0
+        end
+        Process.wait(c.pid)
+        logger.info("Result: #{c.read}")
+      rescue Exception => e
+        logger.error("Exception '#{e}' when executing '#{cmd}'")
+        return false
+      end
+      logger.warn("Non-null exit code when executing '#{cmd}'") if $?.exitstatus != 0
+      $?.exitstatus == 0
+    end
+
+    def popen(cmd)
+      # 1.8.7 note: this assumes that cli options are space-separated
+      cmd = cmd.join(' ') unless RUBY_VERSION > '1.8.7'
+      logger.debug("about to execute: #{cmd}")
+      IO.popen(cmd)
+    end
+
     def find_salt_binaries
       @salt_key = which('salt-key')
       unless File.exists?("#{@salt_key}")
@@ -159,6 +159,5 @@ module Proxy::Salt
       logger.debug "Found sudo at #{@sudo}"
       @sudo = "#{@sudo}"
     end
-
   end
 end

@@ -1,6 +1,5 @@
 require 'sinatra'
 require 'smart_proxy_salt/salt'
-require 'smart_proxy_salt/salt_main'
 
 module Proxy::Salt
   class Api < ::Sinatra::Base
@@ -34,6 +33,26 @@ module Proxy::Salt
         Proxy::Salt::autosign_list.to_json
       rescue => e
         log_halt 406, "Failed to list autosign entries: #{e}"
+      end
+    end
+
+    get '/environments' do
+      content_type :json
+      begin
+        Proxy::Salt::environments_list
+      rescue => e
+        log_halt 406, "Failed to list environments: #{e}"
+      end
+    end
+
+    get '/environments/:environment' do
+      content_type :json
+      begin
+        Proxy::Salt::states_list params[:environment]
+      rescue Proxy::Salt::NotFound => e
+        log_halt 404, "#{e}"
+      rescue => e
+        log_halt 406, "Failed to list states for #{params[:host]}: #{e}"
       end
     end
 
@@ -82,6 +101,5 @@ module Proxy::Salt
         log_halt 406, "Failed to list keys: #{e}"
       end
     end
-
   end
 end
