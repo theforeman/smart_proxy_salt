@@ -52,7 +52,7 @@ def write_last_uploaded(last_uploaded):
         f.write(last_uploaded)
 
 
-def run(function, argument={}):
+def run(function, argument=[]):
     __opts__ = salt.config.master_config(
             os.environ.get('SALT_MASTER_CONFIG', '/etc/salt/master'))
 
@@ -62,7 +62,7 @@ def run(function, argument={}):
         sys.stdout = f
         ret = runner.cmd(function, argument)
     sys.stdout = stdout_bak
-    return ret
+    return ret['data'] if 'data' in ret else ret
 
 
 def jobs_to_upload():
