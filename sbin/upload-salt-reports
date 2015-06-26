@@ -128,3 +128,4 @@ if __name__ == '__main__':
         release_lock()
     except:
         release_lock()
+        traceback.print_exc()
