@@ -25,9 +25,17 @@ def salt_config():
 
 
 def get_job(job_id):
+    result = run('jobs.lookup_jid', argument=[job_id])
+
+    # If any minion's results are strings, they're exceptions
+    # and should be wrapped in a list like other errors
+    for minion, value in result.iteritems():
+        if type(value) == str:
+            result[minion] = [value]
+
     return {'job':
              {
-               'result': run('jobs.lookup_jid', argument=[job_id]),
+               'result': result,
                'function': 'state.highstate',
                'job_id': job_id
              }
