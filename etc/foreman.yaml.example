@@ -1,10 +1,10 @@
 ---
-:proto: http
+:proto: https
 :host: foreman.example.com
-:port: 3000
-:ssl_ca: "" 
-:ssl_cert: ""
-:ssl_key: ""
+:port: 443
+:ssl_ca: "/var/lib/puppet/ssl/certs/ca.pem"
+:ssl_cert: "/var/lib/puppet/ssl/private_keys/foreman.example.com.pem"
+:ssl_key: "/var/lib/puppet/ssl/certs/foreman.example.com.pem"
 :timeout:  10
 :salt:  /usr/bin/salt
 :upload_grains:  true
