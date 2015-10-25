@@ -91,7 +91,12 @@ EOF
   end
 
   grains = JSON.load(result)
-  plainify(grains[minion]).flatten.inject(&:merge)
+
+  if grains
+    plainify(grains[minion]).flatten.inject(&:merge)
+  else
+    raise 'No grains received from Salt master'
+  end
 end
 
 def plainify(hash, prefix = nil)
