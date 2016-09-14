@@ -11,6 +11,7 @@ import json
 import yaml
 import os
 import sys
+import base64
 
 import traceback
 
@@ -101,6 +102,10 @@ def upload(jobs):
     else:
         connection = httplib.HTTPConnection(config[':host'],
                 port=config[':port'])
+        if ':username' in config and ':password' in config:
+            token = base64.b64encode('{}:{}'.format(config[':username'],
+                                                    config[':password']))
+            headers['Authorization'] = 'Basic {}'.format(token)
 
     for id in jobs[0]:
         job = jobs[1][id]
