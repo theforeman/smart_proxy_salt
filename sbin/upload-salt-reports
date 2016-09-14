@@ -7,6 +7,7 @@ LOCK_FILE = '/var/lock/salt-report-upload.lock'
 
 import urllib
 import httplib
+import ssl
 import json
 import yaml
 import os
@@ -95,9 +96,12 @@ def upload(jobs):
                'Content-Type': 'application/json'}
 
     if config[':proto'] == 'https':
+        ctx = ssl.create_default_context()
+        ctx.load_cert_chain(certfile=config[':ssl_cert'], keyfile=config[':ssl_key'])
+        if config[':ssl_ca']:
+          ctx.load_verify_locations(cafile=config[':ssl_ca'])
         connection = httplib.HTTPSConnection(config[':host'],
-                port=config[':port'], key_file=config[':ssl_key'],
-                cert_file=config[':ssl_cert'])
+                port=config[':port'], context=ctx)
     else:
         connection = httplib.HTTPConnection(config[':host'],
                 port=config[':port'])
