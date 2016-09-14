@@ -185,12 +185,12 @@ begin
   result = ''
 
   if SETTINGS[:upload_grains]
-    timeout(SETTINGS[:timeout]) do
+    Timeout.timeout(SETTINGS[:timeout]) do
       upload_grains(minion)
     end
   end
 
-  timeout(SETTINGS[:timeout]) do
+  Timeout.timeout(SETTINGS[:timeout]) do
     result = enc(minion)
   end
   puts result
