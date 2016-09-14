@@ -146,6 +146,10 @@ def upload_grains(minion)
         res.cert = OpenSSL::X509::Certificate.new(File.read(SETTINGS[:ssl_cert]))
         res.key  = OpenSSL::PKey::RSA.new(File.read(SETTINGS[:ssl_key]), nil)
       end
+    else
+      if SETTINGS[:username] && SETTING[:password]
+        req.basic_auth(SETTINGS[:username], SETTING[:password])
+      end
     end
     res.start { |http| http.request(req) }
   rescue => e
@@ -169,6 +173,10 @@ def enc(minion)
     if SETTINGS[:ssl_cert] && !SETTINGS[:ssl_cert].empty? && SETTINGS[:ssl_key] && !SETTINGS[:ssl_key].empty?
       http.cert = OpenSSL::X509::Certificate.new(File.read(SETTINGS[:ssl_cert]))
       http.key  = OpenSSL::PKey::RSA.new(File.read(SETTINGS[:ssl_key]), nil)
+    end
+  else
+    if SETTINGS[:username] && SETTING[:password]
+      req.basic_auth(SETTINGS[:username], SETTING[:password])
     end
   end
 
