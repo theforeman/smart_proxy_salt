@@ -84,7 +84,7 @@ if __name__ == '__main__':
     print json.dumps(ret)
 EOF
 
-  result = IO.popen('python', mode='r+') do |python|
+  result = IO.popen('python 2>/dev/null', mode='r+') do |python|
     python.write script
     python.close_write
     result = python.read
