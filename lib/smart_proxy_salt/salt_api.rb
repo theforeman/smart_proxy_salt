@@ -59,7 +59,7 @@ module Proxy::Salt
     post '/highstate/:host' do
       content_type :json
       begin
-        log_halt 500, "Failed salt run for #{params[:host]}: Check Log files" unless (result = Proxy::Salt.highstate(params[:host]))
+        log_halt 500, "Failed salt run for #{params[:host]}: Check Log files" unless (result = Proxy::Salt.highstate(params[:host], JSON.parse(request.body.read)))
         result
       rescue => e
         log_halt 406, "Failed salt run for #{params[:host]}: #{e}"
