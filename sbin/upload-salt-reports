@@ -82,7 +82,7 @@ def jobs_to_upload():
     last_uploaded = read_last_uploaded()
 
     job_ids = [id for (id, value) in jobs.iteritems()
-            if value['Function'] == 'state.highstate' and
+            if value['Function'] in ('state.highstate', 'state.apply') and
             int(id) > last_uploaded]
 
     jobs = dict([(job, get_job(job)) for job in job_ids])
