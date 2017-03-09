@@ -78,12 +78,13 @@ def run(*args, **kwargs):
 
 
 def jobs_to_upload():
-    jobs = run('jobs.list_jobs')
+    jobs = run('jobs.list_jobs', kwarg={
+        "search_function": "state.highstate",
+    })
     last_uploaded = read_last_uploaded()
 
-    job_ids = [id for (id, value) in jobs.iteritems()
-            if value['Function'] == 'state.highstate' and
-            int(id) > last_uploaded]
+    job_ids = [jid for (jid, value) in jobs.iteritems()
+               if int(jid) > last_uploaded]
 
     jobs = dict([(job, get_job(job)) for job in job_ids])
     ids = sorted(jobs.keys())
