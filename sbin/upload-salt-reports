@@ -86,10 +86,8 @@ def jobs_to_upload():
     job_ids = [jid for (jid, value) in jobs.iteritems()
                if int(jid) > last_uploaded]
 
-    jobs = dict([(job, get_job(job)) for job in job_ids])
-    ids = sorted(jobs.keys())
-
-    return (ids, jobs)
+    for job_id in sorted(job_ids):
+        yield job_id, get_job(job_id)
 
 
 def upload(jobs):
@@ -112,8 +110,7 @@ def upload(jobs):
                                                     config[':password']))
             headers['Authorization'] = 'Basic {}'.format(token)
 
-    for id in jobs[0]:
-        job = jobs[1][id]
+    for job_id, job in jobs:
 
         if job['job']['result'] == {}:
             continue
@@ -123,8 +120,8 @@ def upload(jobs):
         response = connection.getresponse()
 
         if response.status == 200:
-            write_last_uploaded(id)
-            print "Success %s: %s" % (id, response.read())
+            write_last_uploaded(job_id)
+            print "Success %s: %s" % (job_id, response.read())
         else:
             print "Unable to upload job - aborting report upload"
             print response.read()
