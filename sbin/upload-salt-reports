@@ -68,11 +68,12 @@ def run(function, argument=[]):
             os.environ.get('SALT_MASTER_CONFIG', '/etc/salt/master'))
 
     runner = salt.runner.Runner(__opts__)
-    stdout_bak = sys.stdout
     with open(os.devnull, 'wb') as f:
-        sys.stdout = f
-        ret = runner.cmd(function, argument)
-    sys.stdout = stdout_bak
+        stdout_bak, sys.stdout = sys.stdout, f
+        try:
+            ret = runner.cmd(function, argument)
+        finally:
+            sys.stdout = stdout_bak
     return ret['data'] if 'data' in ret else ret
 
 
