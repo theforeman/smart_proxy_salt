@@ -5,7 +5,6 @@ LAST_UPLOADED = '/etc/salt/last_uploaded'
 FOREMAN_CONFIG = '/etc/salt/foreman.yaml'
 LOCK_FILE = '/var/lock/salt-report-upload.lock'
 
-import urllib
 import httplib
 import ssl
 import json
