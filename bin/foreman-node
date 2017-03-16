@@ -172,7 +172,7 @@ def enc(minion)
       http.cert = OpenSSL::X509::Certificate.new(File.read(SETTINGS[:ssl_cert]))
       http.key  = OpenSSL::PKey::RSA.new(File.read(SETTINGS[:ssl_key]), nil)
     end
-  elsif SETTINGS[:username] && SETTING[:password]
+  elsif SETTINGS[:username] && SETTINGS[:password]
     req.basic_auth(SETTINGS[:username], SETTINGS[:password])
   end
 
