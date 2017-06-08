@@ -115,6 +115,17 @@ def upload(jobs):
         if job['job']['result'] == {}:
             continue
 
+        # Convert duration to seconds to conform with Puppet run
+        # duration, and in turn, the run time on Foreman reports
+
+        for node, states in job['job']['result'].iteritems():
+            if isinstance(states, dict):
+                for state, params in states.iteritems():
+                    for key, value in params.iteritems():
+                        if key == 'duration' and isinstance(value, float):
+                            value = value / 1000
+                            job['job']['result'][node][state][key] = value
+
         connection.request('POST', '/salt/api/v2/jobs/upload',
                 json.dumps(job), headers)
         response = connection.getresponse()
