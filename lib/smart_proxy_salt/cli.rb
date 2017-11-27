@@ -72,13 +72,13 @@ module Proxy::Salt::CLI
 
     def key_reject(host)
       find_salt_binaries
-      cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt_key, '--yes', '-r', escape_for_shell(host)]
+      cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt_key, '--include-accepted', '--yes', '-r', escape_for_shell(host)]
       shell_command(cmd)
     end
 
     def key_accept(host)
       find_salt_binaries
-      cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt_key, '--yes', '-a', escape_for_shell(host)]
+      cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt_key, '--include-rejected', '--yes', '-a', escape_for_shell(host)]
       shell_command(cmd)
     end
 
