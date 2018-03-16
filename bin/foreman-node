@@ -72,7 +72,7 @@ import salt.runner
 
 if __name__ == '__main__':
     __opts__ = salt.config.master_config(
-            os.environ.get('SALT_MASTER_CONFIG', '/etc/salt/minion'))
+            os.environ.get('SALT_MASTER_CONFIG', '/etc/salt/master'))
     runner = salt.runner.Runner(__opts__)  
    
     stdout_bak = sys.stdout
