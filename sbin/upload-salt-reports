@@ -107,10 +107,11 @@ def upload(jobs):
     else:
         connection = httplib.HTTPConnection(config[':host'],
                 port=config[':port'])
-        if ':username' in config and ':password' in config:
-            token = base64.b64encode('{}:{}'.format(config[':username'],
-                                                    config[':password']))
-            headers['Authorization'] = 'Basic {}'.format(token)
+
+    if ':username' in config and ':password' in config:
+        token = base64.b64encode('{}:{}'.format(config[':username'],
+                                                config[':password']))
+        headers['Authorization'] = 'Basic {}'.format(token)
 
     for job_id, job in jobs:
 
