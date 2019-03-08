@@ -93,6 +93,9 @@ EOF
   grains = JSON.load(result)
 
   if grains
+    grains[minion]['ip_interfaces'].each do |key, value|
+      grains[minion]['ip_interfaces'][key] = grains[minion]['ip_interfaces'][key][0]
+    end
     plainify(grains[minion]).flatten.inject(&:merge)
   else
     raise 'No grains received from Salt master'
