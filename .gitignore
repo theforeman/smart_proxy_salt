@@ -1,1 +1,6 @@
 .idea
+.local
+.bundle
+Gemfile.lock
+logs
+*swp
