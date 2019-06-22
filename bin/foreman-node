@@ -1,12 +1,14 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 # This is the external nodes script to allow Salt to retrieve info about a host
 # from Foreman.  It also uploads a node's grains to Foreman, if the setting is
 # enabled.
 
 require 'yaml'
 
-$settings_file = '/etc/salt/foreman.yaml'
-SETTINGS = YAML.load_file($settings_file)
+settings_file = '/etc/salt/foreman.yaml'
+SETTINGS = YAML.load_file(settings_file)
 
 require 'net/http'
 require 'net/https'
@@ -19,9 +21,13 @@ rescue LoadError
   # Debian packaging guidelines state to avoid needing rubygems, so
   # we only try to load it if the first require fails (for RPMs)
   begin
-    require 'rubygems' rescue nil
+    begin
+      require 'rubygems'
+    rescue Exception
+      nil
+    end
     require 'json'
-  rescue LoadError => e
+  rescue LoadError
     puts 'You need the `json` gem to use the Foreman ENC script'
     # code 1 is already used below
     exit 2
@@ -37,20 +43,18 @@ def valid_hostname?(hostname)
 end
 
 def get_grains(minion)
-  begin
-    grains = {
-      :name  => minion,
-      :facts => plain_grains(minion).merge({:_timestamp => Time.now, :_type => 'foreman_salt'})
-    }
+  grains = {
+    :name  => minion,
+    :facts => plain_grains(minion).merge(:_timestamp => Time.now, :_type => 'foreman_salt')
+  }
 
-    grains[:facts][:operatingsystem] = grains[:facts]['os']
-    grains[:facts][:operatingsystemrelease] = grains[:facts]['osrelease']
+  grains[:facts][:operatingsystem] = grains[:facts]['os']
+  grains[:facts][:operatingsystemrelease] = grains[:facts]['osrelease']
 
-    JSON.pretty_generate(grains)
-  rescue => e
-    puts "Could not get grains: #{e}"
-    exit 1
-  end
+  JSON.pretty_generate(grains)
+rescue Exception => e
+  puts "Could not get grains: #{e}"
+  exit 1
 end
 
 def plain_grains(minion)
@@ -61,7 +65,7 @@ def plain_grains(minion)
   # so we have resort to python to extract the grains.
   # Based on https://github.com/saltstack/salt/issues/9444
 
-script = <<-EOF
+  script = <<-EOF
 #!/usr/bin/env python
 import json
 import os
@@ -73,30 +77,28 @@ import salt.runner
 if __name__ == '__main__':
     __opts__ = salt.config.master_config(
             os.environ.get('SALT_MASTER_CONFIG', '/etc/salt/master'))
-    runner = salt.runner.Runner(__opts__)  
-   
+    runner = salt.runner.Runner(__opts__)
+
     stdout_bak = sys.stdout
     with open(os.devnull, 'wb') as f:
-        sys.stdout = f  
+        sys.stdout = f
         ret = runner.cmd('cache.grains', ['#{minion}'])
     sys.stdout = stdout_bak
 
     print json.dumps(ret)
 EOF
 
-  result = IO.popen('python 2>/dev/null', mode='r+') do |python|
+  result = IO.popen('python 2>/dev/null', 'r+') do |python|
     python.write script
     python.close_write
     result = python.read
   end
 
-  grains = JSON.load(result)
+  grains = JSON.parse(result)
 
-  if grains
-    plainify(grains[minion]).flatten.inject(&:merge)
-  else
-    raise 'No grains received from Salt master'
-  end
+  raise 'No grains received from Salt master' unless grains
+
+  plainify(grains[minion]).flatten.inject(&:merge)
 end
 
 def plainify(hash, prefix = nil)
@@ -126,33 +128,31 @@ def get_key(key, prefix)
 end
 
 def upload_grains(minion)
-  begin
-    grains = get_grains(minion)
-    uri = URI.parse("#{foreman_url}/api/hosts/facts")
-    req = Net::HTTP::Post.new(uri.request_uri)
-    req.add_field('Accept', 'application/json,version=2' )
-    req.content_type = 'application/json'
-    req.body         = grains 
-    res              = Net::HTTP.new(uri.host, uri.port)
-    res.use_ssl      = uri.scheme == 'https'
-    if res.use_ssl?
-      if SETTINGS[:ssl_ca] && !SETTINGS[:ssl_ca].empty?
-        res.ca_file = SETTINGS[:ssl_ca]
-        res.verify_mode = OpenSSL::SSL::VERIFY_PEER
-      else
-        res.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      end
-      if SETTINGS[:ssl_cert] && !SETTINGS[:ssl_cert].empty? && SETTINGS[:ssl_key] && !SETTINGS[:ssl_key].empty?
-        res.cert = OpenSSL::X509::Certificate.new(File.read(SETTINGS[:ssl_cert]))
-        res.key  = OpenSSL::PKey::RSA.new(File.read(SETTINGS[:ssl_key]), nil)
-      end
-    elsif SETTINGS[:username] && SETTINGS[:password]
-      req.basic_auth(SETTINGS[:username], SETTINGS[:password])
+  grains = get_grains(minion)
+  uri = URI.parse("#{foreman_url}/api/hosts/facts")
+  req = Net::HTTP::Post.new(uri.request_uri)
+  req.add_field('Accept', 'application/json,version=2')
+  req.content_type = 'application/json'
+  req.body         = grains
+  res              = Net::HTTP.new(uri.host, uri.port)
+  res.use_ssl      = uri.scheme == 'https'
+  if res.use_ssl?
+    if SETTINGS[:ssl_ca] && !SETTINGS[:ssl_ca].empty?
+      res.ca_file = SETTINGS[:ssl_ca]
+      res.verify_mode = OpenSSL::SSL::VERIFY_PEER
+    else
+      res.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
-    res.start { |http| http.request(req) }
-  rescue => e
-    raise "Could not send facts to Foreman: #{e}"
+    if SETTINGS[:ssl_cert] && !SETTINGS[:ssl_cert].empty? && SETTINGS[:ssl_key] && !SETTINGS[:ssl_key].empty?
+      res.cert = OpenSSL::X509::Certificate.new(File.read(SETTINGS[:ssl_cert]))
+      res.key  = OpenSSL::PKey::RSA.new(File.read(SETTINGS[:ssl_key]), nil)
+    end
+  elsif SETTINGS[:username] && SETTINGS[:password]
+    req.basic_auth(SETTINGS[:username], SETTINGS[:password])
   end
+  res.start { |http| http.request(req) }
+rescue Exception => e
+  raise "Could not send facts to Foreman: #{e}"
 end
 
 def enc(minion)
@@ -176,7 +176,7 @@ def enc(minion)
     req.basic_auth(SETTINGS[:username], SETTINGS[:password])
   end
 
-  res = http.start { |http| http.request(req) }
+  res = http.start { |conn| conn.request(req) }
 
   raise "Error retrieving node #{minion}: #{res.class}\nCheck Foreman's /var/log/foreman/production.log for more information." unless res.code == '200'
   res.body
@@ -198,7 +198,7 @@ begin
     result = enc(minion)
   end
   puts result
-rescue => e
+rescue Exception => e
   puts "Couldn't retrieve ENC data: #{e}"
   exit 1
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.expand_path('../lib/smart_proxy_salt/version', __FILE__)
 
 Gem::Specification.new do |s|
@@ -13,4 +15,15 @@ Gem::Specification.new do |s|
   s.executables      = s.files.grep(%r{^bin/}) { |file| File.basename(file) }
   s.homepage         = 'https://github.com/theforeman/smart_proxy_salt'
   s.license          = 'GPL-3.0'
+  s.add_dependency('json')
+  s.add_dependency('rack', '>= 1.1')
+  s.add_dependency('sinatra')
+  s.add_dependency('logging')
+
+  s.add_development_dependency('test-unit', '~> 2')
+  s.add_development_dependency('mocha', '~> 1')
+  s.add_development_dependency('webmock', '~> 1')
+  s.add_development_dependency('rake', '~> 10')
+  s.add_development_dependency('rubocop', '0.32.1')
+  s.add_development_dependency('rack-test', '~> 0')
 end
