@@ -2,7 +2,16 @@
 
 require 'rake'
 require 'rake/testtask'
-require 'bundler/gem_tasks'
+require "rake/clean"
+CLOBBER.include "pkg"
+
+%w(smart_proxy_salt smart_proxy_salt_core).each do |plugin|
+  namespace plugin do
+    require 'bundler/gem_helper'
+    Bundler::GemHelper.install_tasks(:name => plugin)
+  end
+end
+
 
 desc 'Default: run unit tests.'
 task :default => :test
