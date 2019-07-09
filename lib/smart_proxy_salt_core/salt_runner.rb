@@ -19,10 +19,23 @@ module SmartProxySaltCore
       ::Process.kill('SIGTERM', @command_pid)
     end
 
+    def publish_data(data, type)
+      if @jid.nil? && (match = data.match(/jid: ([0-9]+)/))
+        @jid = match[1]
+      end
+      super
+    end
+
+    def publish_exit_status(status)
+      # If there was no salt job associated with this run, mark the job as failed
+      status = 1 if @jid.nil?
+      super status
+    end
+
     private
 
     def generate_command
-      command = %w(salt)
+      command = %w(salt --show-jid)
       command << @options['name']
       command << 'state.template_str'
       command << @options['script']
