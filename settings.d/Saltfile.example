@@ -1,0 +1,3 @@
+salt:
+  log_file: /var/log/foreman-proxy/salt.log
+  log_level_logfile: debug
