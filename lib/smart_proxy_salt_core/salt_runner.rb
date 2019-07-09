@@ -1,6 +1,10 @@
+require 'foreman_tasks_core/runner/command_runner'
+
 module SmartProxySaltCore
   class SaltRunner < ForemanTasksCore::Runner::CommandRunner
     DEFAULT_REFRESH_INTERVAL = 1
+
+    attr_reader :jid
 
     def initialize(options, suspended_action:)
       super(options, :suspended_action => suspended_action)
