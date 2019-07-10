@@ -2,8 +2,9 @@ require 'foreman_tasks_core'
 require 'foreman_remote_execution_core'
 
 module SmartProxySaltCore
-  # extend ForemanTasksCore::SettingsLoader
-  # register_settings(:salt)
+  extend ForemanTasksCore::SettingsLoader
+  register_settings(:salt,
+                    :saltfile => '/etc/foreman-proxy/settings.d/salt.saltfile')
 
   if ForemanTasksCore.dynflow_present?
     require 'smart_proxy_salt_core/salt_runner'

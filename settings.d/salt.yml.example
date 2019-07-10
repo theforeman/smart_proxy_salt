@@ -9,3 +9,4 @@
 :api_auth: pam
 :api_username: saltuser
 :api_password: password
+# :saltfile: '/etc/foreman-proxy/settings.d/salt.saltfile'

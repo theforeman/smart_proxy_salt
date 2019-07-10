@@ -39,7 +39,7 @@ module SmartProxySaltCore
     private
 
     def generate_command
-      saltfile_path = '/etc/foreman-proxy/settings.d/salt.saltfile'
+      saltfile_path = SmartProxySaltCore.settings[:saltfile]
       command = %w(salt --show-jid)
       command << "--saltfile=#{saltfile_path}" if File.file?(saltfile_path)
       command << @options['name']
