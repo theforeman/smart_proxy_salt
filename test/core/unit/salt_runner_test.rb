@@ -36,10 +36,12 @@ if RUBY_VERSION >= '2.3.0'
       end
 
       def test_generate_command
+        saltfile = '/tmp/saltfile'
+        SmartProxySaltCore.expects(:settings).returns({:saltfile => saltfile})
         runner = SaltRunner.new({ 'name' => 'a-host', 'script' => 'ls -la /' },
-          suspended_action: nil)
-        File.expects(:file?).returns(false)
-        expected = %w(salt --show-jid a-host state.template_str) << 'ls -la /'
+                                suspended_action: nil)
+        File.expects(:file?).with(saltfile).returns(true)
+        expected = %W(salt --show-jid --saltfile=#{saltfile} a-host state.template_str) << 'ls -la /'
         assert_equal expected, runner.send(:generate_command)
       end
     end
