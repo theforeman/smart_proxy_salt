@@ -1,14 +1,20 @@
 #!/usr/bin/env python
 # Uploads reports from the Salt job cache to Foreman
 
+from __future__ import print_function
+
 LAST_UPLOADED = '/etc/salt/last_uploaded'
 FOREMAN_CONFIG = '/etc/salt/foreman.yaml'
 LOCK_FILE = '/var/lock/salt-report-upload.lock'
 
-import httplib
+try:
+    from http.client import HTTPConnection, HTTPSConnection
+except ImportError:
+    from httplib import HTTPSConnection, HTTPSConnection
 import ssl
 import json
 import yaml
+import io
 import os
 import sys
 import base64
@@ -20,7 +26,7 @@ import salt.runner
 
 
 def salt_config():
-    with open(FOREMAN_CONFIG, 'r') as f:
+    with io.open(FOREMAN_CONFIG, 'r') as f:
         config = yaml.load(f.read())
     return config
 
@@ -30,7 +36,7 @@ def get_job(job_id):
 
     # If any minion's results are strings, they're exceptions
     # and should be wrapped in a list like other errors
-    for minion, value in result.iteritems():
+    for minion, value in result.items():
         if type(value) == str:
             result[minion] = [value]
 
@@ -47,7 +53,7 @@ def read_last_uploaded():
     if not os.path.isfile(LAST_UPLOADED):
         return 0
     else:
-        with open(LAST_UPLOADED, 'r') as f:
+        with io.open(LAST_UPLOADED, 'r') as f:
             result = f.read().strip()
         if len(result) == 20:
             try:
@@ -59,7 +65,7 @@ def read_last_uploaded():
 
 
 def write_last_uploaded(last_uploaded):
-    with open(LAST_UPLOADED, 'w+') as f:
+    with io.open(LAST_UPLOADED, 'w+') as f:
         f.write(last_uploaded)
 
 
@@ -68,7 +74,7 @@ def run(*args, **kwargs):
             os.environ.get('SALT_MASTER_CONFIG', '/etc/salt/master'))
 
     runner = salt.runner.Runner(__opts__)
-    with open(os.devnull, 'wb') as f:
+    with io.open(os.devnull, 'w') as f:
         stdout_bak, sys.stdout = sys.stdout, f
         try:
             ret = runner.cmd(*args, **kwargs)
@@ -83,7 +89,7 @@ def jobs_to_upload():
     })
     last_uploaded = read_last_uploaded()
 
-    job_ids = [jid for (jid, value) in jobs.iteritems()
+    job_ids = [jid for (jid, value) in jobs.items()
                if int(jid) > last_uploaded]
 
     for job_id in sorted(job_ids):
@@ -99,12 +105,12 @@ def upload(jobs):
         ctx = ssl.create_default_context()
         ctx.load_cert_chain(certfile=config[':ssl_cert'], keyfile=config[':ssl_key'])
         if config[':ssl_ca']:
-          ctx.load_verify_locations(cafile=config[':ssl_ca'])
-        connection = httplib.HTTPSConnection(config[':host'],
-                port=config[':port'], context=ctx)
+            ctx.load_verify_locations(cafile=config[':ssl_ca'])
+        connection = HTTPSConnection(config[':host'],
+                                     port=config[':port'], context=ctx)
     else:
-        connection = httplib.HTTPConnection(config[':host'],
-                port=config[':port'])
+        connection = HTTPConnection(config[':host'],
+                                    port=config[':port'])
         if ':username' in config and ':password' in config:
             token = base64.b64encode('{}:{}'.format(config[':username'],
                                                     config[':password']))
@@ -121,22 +127,23 @@ def upload(jobs):
 
         if response.status == 200:
             write_last_uploaded(job_id)
-            print "Success %s: %s" % (job_id, response.read())
+            print("Success %s: %s" % (job_id, response.read()))
         else:
-            print "Unable to upload job - aborting report upload"
-            print response.read()
+            print("Unable to upload job - aborting report upload")
+            print(response.read())
 
 
 def get_lock():
     if os.path.isfile(LOCK_FILE):
         raise Exception("Unable to obtain lock.")
     else:
-        open(LOCK_FILE, 'w+').close()
+        io.open(LOCK_FILE, 'w+').close()
 
 
 def release_lock():
     if os.path.isfile(LOCK_FILE):
         os.remove(LOCK_FILE)
+
 
 if __name__ == '__main__':
     try:
