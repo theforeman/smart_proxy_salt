@@ -60,38 +60,9 @@ end
 def plain_grains(minion)
   # We have to get the grains from the cache, because the client
   # is probably running 'state.highstate' right now.
-  #
-  # salt-run doesn't support directly outputting to json,
-  # so we have resort to python to extract the grains.
-  # Based on https://github.com/saltstack/salt/issues/9444
 
-  script = <<-EOF
-#!/usr/bin/env python
-import json
-import os
-import sys
-
-import salt.config
-import salt.runner
-
-if __name__ == '__main__':
-    __opts__ = salt.config.master_config(
-            os.environ.get('SALT_MASTER_CONFIG', '/etc/salt/master'))
-    runner = salt.runner.Runner(__opts__)
-
-    stdout_bak = sys.stdout
-    with open(os.devnull, 'wb') as f:
-        sys.stdout = f
-        ret = runner.cmd('cache.grains', ['#{minion}'])
-    sys.stdout = stdout_bak
-
-    print json.dumps(ret)
-EOF
-
-  result = IO.popen('python 2>/dev/null', 'r+') do |python|
-    python.write script
-    python.close_write
-    result = python.read
+  result = IO.popen(['salt-run', '--output=json', 'cache.grains', minion]) do |io|
+    io.read
   end
 
   grains = JSON.parse(result)
