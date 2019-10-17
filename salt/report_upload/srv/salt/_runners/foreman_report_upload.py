@@ -6,7 +6,11 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 FOREMAN_CONFIG = '/etc/salt/foreman.yaml'
 
-import httplib
+try:
+    from http.client import HTTPConnection, HTTPSConnection
+except ImportError:
+    from httplib import HTTPSConnection, HTTPSConnection
+
 import ssl
 import json
 import yaml
@@ -36,10 +40,10 @@ def upload(report):
         ctx.load_cert_chain(certfile=config[':ssl_cert'], keyfile=config[':ssl_key'])
         if config[':ssl_ca']:
           ctx.load_verify_locations(cafile=config[':ssl_ca'])
-        connection = httplib.HTTPSConnection(config[':host'],
+        connection = HTTPSConnection(config[':host'],
                 port=config[':port'], context=ctx)
     else:
-        connection = httplib.HTTPConnection(config[':host'],
+        connection = HTTPConnection(config[':host'],
                 port=config[':port'])
         if ':username' in config and ':password' in config:
             token = base64.b64encode('{}:{}'.format(config[':username'],
