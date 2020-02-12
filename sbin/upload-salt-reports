@@ -89,8 +89,7 @@ def jobs_to_upload():
     })
     last_uploaded = read_last_uploaded()
 
-    job_ids = [jid for (jid, value) in jobs.items()
-               if int(jid) > last_uploaded]
+    job_ids = [jid for jid in jobs.keys() if int(jid) > last_uploaded]
 
     for job_id in sorted(job_ids):
         yield job_id, get_job(job_id)
