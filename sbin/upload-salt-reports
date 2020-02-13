@@ -18,11 +18,12 @@ import io
 import os
 import sys
 import base64
-
 import traceback
-
 import salt.config
 import salt.runner
+
+if sys.version_info.major == 3:
+    unicode = str
 
 
 def salt_config():
@@ -66,7 +67,7 @@ def read_last_uploaded():
 
 def write_last_uploaded(last_uploaded):
     with io.open(LAST_UPLOADED, 'w+') as f:
-        f.write(last_uploaded)
+        f.write(unicode(last_uploaded))
 
 
 def run(*args, **kwargs):
