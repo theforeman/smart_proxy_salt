@@ -40,6 +40,11 @@ def get_job(job_id):
     for minion, value in result.items():
         if type(value) == str:
             result[minion] = [value]
+        else:
+            for key, entry in value.items():
+                if key.startswith('module_') and entry['__id__'] == 'state.highstate':
+                    result[minion] = entry['changes']['ret']
+                    break
 
     return {'job':
              {
@@ -86,7 +91,7 @@ def run(*args, **kwargs):
 
 def jobs_to_upload():
     jobs = run('jobs.list_jobs', kwarg={
-        "search_function": "state.highstate",
+        "search_function": ["state.highstate","state.template_str"],
     })
     last_uploaded = read_last_uploaded()
 

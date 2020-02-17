@@ -65,7 +65,8 @@ def upload(report):
 def create_report(json_str):
     msg = json.loads(json_str)
 
-    return {'job':
+    if msg['fun'] == 'state.highstate':
+        return {'job':
              {
                'result': {
                  msg['id']: msg['return'],
@@ -74,6 +75,19 @@ def create_report(json_str):
                'job_id': msg['jid']
              }
            }
+    elif msg['fun'] == 'state.template_str':
+        for key, entry in msg['return'].items():
+            if key.startswith('module_') and entry['__id__'] == 'state.highstate':
+                return {'job':
+                     {
+                       'result': {
+                         msg['id']: entry['changes']['ret'],
+                       },
+                       'function': 'state.highstate',
+                       'job_id': msg['jid']
+                     }
+                   }
+    raise Exception('No state.highstate found')
 
 
 def now(highstate):
@@ -85,7 +99,7 @@ def now(highstate):
     log.debug('Upload highstate to Foreman')
 
     try:
-        report = create_report(highstate)
+        report = create_report(base64.decodestring(highstate))
         upload(report)
     except Exception as exc:
         log.error('Exception encountered: %s', exc)
