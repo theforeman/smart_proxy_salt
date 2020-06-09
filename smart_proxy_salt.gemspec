@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.authors          = ['Michael Moll', 'Stephen Benjamin']
   s.email            = 'foreman-dev@googlegroups.com'
   s.extra_rdoc_files = ['README.md', 'LICENSE']
-  s.files            = Dir['{bin,cron,etc,lib,salt,sbin,settings.d,bundler.d}/**/*'] + s.extra_rdoc_files
+  s.files            = Dir['{bin,cron,etc,lib/smart_proxy_salt,salt,sbin,settings.d,bundler.d}/**/*'] + ['lib/smart_proxy_salt.rb'] + s.extra_rdoc_files
   s.executables      = s.files.grep(%r{^bin/}) { |file| File.basename(file) }
   s.homepage         = 'https://github.com/theforeman/smart_proxy_salt'
   s.license          = 'GPL-3.0'
