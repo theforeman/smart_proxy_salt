@@ -61,7 +61,7 @@ def plain_grains(minion)
   # We have to get the grains from the cache, because the client
   # is probably running 'state.highstate' right now.
 
-  result = IO.popen(['salt-run', '--output=json', 'cache.grains', minion]) do |io|
+  result = IO.popen(['salt-run', '-l', 'quiet', '--output=json', 'cache.grains', minion]) do |io|
     io.read
   end
 
