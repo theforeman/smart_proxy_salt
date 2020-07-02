@@ -34,17 +34,22 @@ def salt_config():
 
 def get_job(job_id):
     result = run('jobs.lookup_jid', [job_id])
-
     # If any minion's results are strings, they're exceptions
     # and should be wrapped in a list like other errors
+
     for minion, value in result.items():
-        if type(value) == str:
-            result[minion] = [value]
-        else:
-            for key, entry in value.items():
-                if key.startswith('module_') and entry['__id__'] == 'state.highstate':
-                    result[minion] = entry['changes']['ret']
-                    break
+        try:
+            if isinstance(value,str):
+                result[minion] = [value]
+            elif isinstance(value,list):
+                result[minion] = value
+            else:
+                for key, entry in value.items():
+                    if key.startswith('module_') and entry['__id__'] == 'state.highstate':
+                        result[minion] = entry['changes']['ret']
+                        break
+        except KeyError:
+            traceback.print_exc()
 
     return {'job':
              {
