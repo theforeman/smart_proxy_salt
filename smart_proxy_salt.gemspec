@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('test-unit', '~> 2')
   s.add_development_dependency('mocha', '~> 1')
   s.add_development_dependency('webmock', '~> 1')
-  s.add_development_dependency('rake', '~> 10')
-  s.add_development_dependency('rubocop', '0.32.1')
+  s.add_development_dependency('rake', '~> 13')
+  s.add_development_dependency('rubocop', '0.50.0')
   s.add_development_dependency('rack-test', '~> 0')
 end
