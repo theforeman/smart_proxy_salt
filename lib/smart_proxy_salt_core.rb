@@ -1,6 +1,7 @@
 require 'foreman_tasks_core'
 require 'foreman_remote_execution_core'
 
+# SmartProxySaltCore
 module SmartProxySaltCore
   extend ForemanTasksCore::SettingsLoader
   register_settings(:salt,

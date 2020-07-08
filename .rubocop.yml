@@ -1,7 +1,7 @@
 AllCops:
   TargetRubyVersion: 2.0
 
-Style/DotPosition:
+Layout/DotPosition:
   EnforcedStyle: 'trailing'
 
 Lint/RescueException:
@@ -24,7 +24,7 @@ Metrics/ModuleLength:
 Metrics/PerceivedComplexity:
   Max: 15
 
-Style/FileName:
+Naming/FileName:
   Exclude:
     - 'bin/foreman-node'
 

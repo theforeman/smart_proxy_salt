@@ -14,10 +14,7 @@ require 'net/http'
 require 'net/https'
 require 'etc'
 require 'timeout'
-
-if SETTINGS[:filecache]
-  require 'msgpack'
-end
+require 'msgpack' if SETTINGS[:filecache]
 
 begin
   require 'json'
@@ -67,17 +64,14 @@ def get_grains_from_filecache(minion)
   # :filecache: true
   # :cachedir: "/path/to/master/cache" (default: "/var/cache/salt/master")
   # Also, the msgpack rubygem needs to be present
-  cachedir = SETTINGS[:cachedir] || "/var/cache/salt/master"
+  cachedir = SETTINGS[:cachedir] || '/var/cache/salt/master'
   content = File.read("#{cachedir}/minions/#{minion}/data.p")
   data = MessagePack.unpack(content)
-  data["grains"]
+  data['grains']
 end
 
 def get_grains_from_saltrun(minion)
-  result = IO.popen(['salt-run', '-l', 'quiet', '--output=json', 'cache.grains', minion]) do |io|
-    io.read
-  end
-
+  result = IO.popen(['salt-run', '-l', 'quiet', '--output=json', 'cache.grains', minion], &:read)
   data = JSON.parse(result)
   data[minion]
 end
@@ -86,11 +80,11 @@ def plain_grains(minion)
   # We have to get the grains from the cache, because the client
   # is probably running 'state.highstate' right now.
 
-  if SETTINGS[:filecache]
-    grains = get_grains_from_filecache(minion)
-  else
-    grains = get_grains_from_saltrun(minion)
-  end
+  grains = if SETTINGS[:filecache]
+             get_grains_from_filecache(minion)
+           else
+             get_grains_from_saltrun(minion)
+           end
 
   raise 'No grains received from Salt master' unless grains
 

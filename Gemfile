@@ -23,9 +23,9 @@ group :test do
 end
 
 if RUBY_VERSION < '2.2'
-  gem 'sinatra', '< 2'
   gem 'rack', '>= 1.1', '< 2.0.0'
+  gem 'sinatra', '< 2'
 else
-  gem 'sinatra'
   gem 'rack', '>= 1.1'
+  gem 'sinatra'
 end
