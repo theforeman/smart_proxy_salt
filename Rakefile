@@ -2,16 +2,15 @@
 
 require 'rake'
 require 'rake/testtask'
-require "rake/clean"
-CLOBBER.include "pkg"
+require 'rake/clean'
+CLOBBER.include 'pkg'
 
-%w(smart_proxy_salt smart_proxy_salt_core).each do |plugin|
+%w[smart_proxy_salt smart_proxy_salt_core].each do |plugin|
   namespace plugin do
     require 'bundler/gem_helper'
     Bundler::GemHelper.install_tasks(:name => plugin)
   end
 end
-
 
 desc 'Default: run unit tests.'
 task :default => :test
@@ -29,6 +28,6 @@ require 'rubocop/rake_task'
 
 desc 'Run RuboCop on the lib directory'
 RuboCop::RakeTask.new(:rubocop) do |task|
-  task.patterns = ['lib/**/*.rb', 'test/**/*.rb']
+  task.patterns = ['bin/foreman-node', 'lib/**/*.rb', 'test/**/*.rb']
   task.fail_on_error = false
 end

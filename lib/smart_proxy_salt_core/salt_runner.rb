@@ -1,12 +1,13 @@
 require 'foreman_tasks_core/runner/command_runner'
 
 module SmartProxySaltCore
+  # Implements the SaltRunner to be used by foreman_remote_execution
   class SaltRunner < ForemanTasksCore::Runner::CommandRunner
     DEFAULT_REFRESH_INTERVAL = 1
 
     attr_reader :jid
 
-    def initialize(options, suspended_action:)
+    def initialize(options, suspended_action)
       super(options, :suspended_action => suspended_action)
       @options = options
     end
@@ -40,7 +41,7 @@ module SmartProxySaltCore
 
     def generate_command
       saltfile_path = SmartProxySaltCore.settings[:saltfile]
-      command = %w(salt --show-jid)
+      command = %w[salt --show-jid]
       command << "--saltfile=#{saltfile_path}" if File.file?(saltfile_path)
       command << @options['name']
       command << 'state.template_str'

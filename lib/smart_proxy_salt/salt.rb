@@ -33,6 +33,10 @@ module Proxy
           super
         end
       end
+
+      def respond_to_missing?(method, include_private = false)
+        Proxy::Salt::Rest.respond_to?(method) || Proxy::Salt::CLI.respond_to?(method) || super
+      end
     end
   end
 end

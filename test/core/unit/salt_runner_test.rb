@@ -7,7 +7,7 @@ if RUBY_VERSION >= '2.3.0'
   module SmartProxySaltCore
     class SaltRunnerTest < Test::Unit::TestCase
       def test_capture_jid
-        data = <<-EOF
+        data = <<-TESTDATA
         [WARNING ] /usr/lib/python3.7/site-packages/salt/transport/ipc.py:292: DeprecationWarning: encoding is deprecated, Use raw=False instead.
           self.unpacker = msgpack.Unpacker(encoding=encoding)
 
@@ -17,8 +17,8 @@ if RUBY_VERSION >= '2.3.0'
 
         258b7c8b6c9d:
             True
-      EOF
-        runner = SaltRunner.new({}, suspended_action: nil)
+      TESTDATA
+        runner = SaltRunner.new({}, :suspended_action => nil)
         assert_nil runner.jid
         runner.publish_data(data, 'stdout')
         assert_equal '20190709172718917803', runner.jid
@@ -28,7 +28,7 @@ if RUBY_VERSION >= '2.3.0'
       end
 
       def test_override_exit_status
-        runner = SaltRunner.new({}, suspended_action: nil)
+        runner = SaltRunner.new({}, :suspended_action => nil)
         assert_nil runner.jid
         assert_equal 1, runner.publish_exit_status(0)
         runner.publish_data('jid: 12345', 'stdout')
@@ -37,11 +37,11 @@ if RUBY_VERSION >= '2.3.0'
 
       def test_generate_command
         saltfile = '/tmp/saltfile'
-        SmartProxySaltCore.expects(:settings).returns({:saltfile => saltfile})
+        SmartProxySaltCore.expects(:settings).returns(:saltfile => saltfile)
         runner = SaltRunner.new({ 'name' => 'a-host', 'script' => 'ls -la /' },
-                                suspended_action: nil)
+                                :suspended_action => nil)
         File.expects(:file?).with(saltfile).returns(true)
-        expected = %W(salt --show-jid --saltfile=#{saltfile} a-host state.template_str) << 'ls -la /'
+        expected = %W[salt --show-jid --saltfile=#{saltfile} a-host state.template_str] << 'ls -la /'
         assert_equal expected, runner.send(:generate_command)
       end
     end
