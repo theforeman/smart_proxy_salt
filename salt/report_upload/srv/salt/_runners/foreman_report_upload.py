@@ -99,7 +99,7 @@ def now(highstate):
     log.debug('Upload highstate to Foreman')
 
     try:
-        report = create_report(base64.decodestring(highstate))
+        report = create_report(base64.b64decode(highstate))
         upload(report)
     except Exception as exc:
         log.error('Exception encountered: %s', exc)
