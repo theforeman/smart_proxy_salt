@@ -10,6 +10,7 @@ require 'smart_proxy_salt/salt'
 require 'smart_proxy_salt/salt_api'
 
 # smart_proxy_salt tests running on CLI
+# rubocop:disable ClassLength
 class SaltCLITest < Test::Unit::TestCase
   include Rack::Test::Methods
 
@@ -20,10 +21,10 @@ class SaltCLITest < Test::Unit::TestCase
   def setup
     @salt_rest_api = 'http://localhost/salt_rest_api'
 
-    autosign_file = Tempfile.new('autosign_file')
-    autosign_file.puts('my_salt_host_1.domain1')
-    autosign_file.puts('my_salt_host_2.domain2')
-    autosign_file.puts('*.all.domain3')
+    autosign_file = Tempfile.new('autosign_foreman_provisioning_key')
+    autosign_file.puts('bdf9f052723195aa35f94a4bc5512fdc')
+    autosign_file.puts('# Ignore this comment, please')
+    autosign_file.puts('03e3cb85330f403d75f315166e93f123')
     autosign_file.close
     @autosign_file_path = autosign_file.path
 
@@ -101,10 +102,18 @@ class SaltCLITest < Test::Unit::TestCase
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
   end
 
+  def test_access_to_notexistant_file
+    Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => true, :autosign_file => '/this/file/doesnt/exist')
+    post '/autosign/bdf9f052723195aa35f94a4bc5512fdc'
+    assert last_response.ok?, "Last response was not ok: #{last_response.body}"
+    msg = JSON.parse(last_response.body)
+    assert_match(/Attempt to add autosign key bdf9f052723195aa35f94a4bc5512fdc but exception happend/, msg['message'])
+  end
+
   def test_autosign_list
     get '/autosign'
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
-    assert_equal('["my_salt_host_1.domain1","my_salt_host_2.domain2","*.all.domain3"]', last_response.body)
+    assert_equal('["bdf9f052723195aa35f94a4bc5512fdc","03e3cb85330f403d75f315166e93f123"]', last_response.body)
   end
 
   def test_autosign_list_missing_file
@@ -114,20 +123,21 @@ class SaltCLITest < Test::Unit::TestCase
   end
 
   def test_autosign_create
-    post '/autosign/new_host.new_domain'
+    post '/autosign/bdf9f052723195aa35f94a4bc5512fdc'
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
-    assert_equal('{"message":"Added new_host.new_domain to autosign"}', last_response.body)
+    assert_equal('{"message":"Added bdf9f052723195aa35f94a4bc5512fdc to autosign"}', last_response.body)
   end
 
   def test_autosign_delete
-    delete '/autosign/my_salt_host_1.domain1'
+    delete '/autosign/bdf9f052723195aa35f94a4bc5512fdc'
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
-    assert_equal('{"message":"Removed my_salt_host_1.domain1 from autosign"}', last_response.body)
+    assert_equal('{"message":"Removed bdf9f052723195aa35f94a4bc5512fdc from autosign"}', last_response.body)
   end
 
   def test_autosign_delete_unknown_host
     delete '/autosign/unknown_host'
     assert last_response.not_found?, "Last response should fail but was ok: #{last_response.body}"
-    assert_equal('Attempt to remove nonexistant client autosign for unknown_host', last_response.body)
+    assert_equal('Attempt to remove nonexistant autosign key unknown_host', last_response.body)
   end
 end
+# rubocop:enable ClassLength

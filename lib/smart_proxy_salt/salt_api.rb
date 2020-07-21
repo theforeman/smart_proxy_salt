@@ -11,10 +11,30 @@ module Proxy
       helpers ::Proxy::Helpers
       authorize_with_trusted_hosts
 
+      post '/autosign_key/:key' do
+        content_type :json
+        begin
+          Proxy::Salt.autosign_create_key(params[:key]).to_json
+        rescue Exception => e
+          log_halt 406, "Failed to create autosign key #{params[:key]}: #{e}"
+        end
+      end
+
+      delete '/autosign_key/:key' do
+        content_type :json
+        begin
+          Proxy::Salt.autosign_remove_key(params[:key]).to_json
+        rescue Proxy::Salt::NotFound => e
+          log_halt 404, e.to_s
+        rescue Exception => e
+          log_halt 406, "Failed to remove autosign key #{params[:key]}: #{e}"
+        end
+      end
+
       post '/autosign/:host' do
         content_type :json
         begin
-          Proxy::Salt.autosign_create(params[:host]).to_json
+          Proxy::Salt.autosign_create_hostname(params[:host]).to_json
         rescue Exception => e
           log_halt 406, "Failed to create autosign for #{params[:host]}: #{e}"
         end
@@ -23,7 +43,7 @@ module Proxy
       delete '/autosign/:host' do
         content_type :json
         begin
-          Proxy::Salt.autosign_remove(params[:host]).to_json
+          Proxy::Salt.autosign_remove_hostname(params[:host]).to_json
         rescue Proxy::Salt::NotFound => e
           log_halt 404, e.to_s
         rescue Exception => e
