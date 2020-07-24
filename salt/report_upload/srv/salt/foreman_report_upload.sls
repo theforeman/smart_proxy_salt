@@ -6,5 +6,5 @@
  foreman_report_upload:
   runner.foreman_report_upload.now:
     - args:
-      - highstate: '{{data|json|base64_encode}}'
+      - highstate: '{{ data|json|base64_encode }}'
 {% endif %}
