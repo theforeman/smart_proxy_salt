@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/tfm-ruby
 # frozen_string_literal: true
 
 # This is the external nodes script to allow Salt to retrieve info about a host
