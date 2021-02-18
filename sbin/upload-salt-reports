@@ -45,7 +45,7 @@ def get_job(job_id):
                 result[minion] = value
             else:
                 for key, entry in value.items():
-                    if key.startswith('module_') and entry['__id__'] == 'state.highstate':
+                    if key.startswith('module_') and '__id__' in entry and entry['__id__'] == 'state.highstate':
                         result[minion] = entry['changes']['ret']
                         break
         except KeyError:
