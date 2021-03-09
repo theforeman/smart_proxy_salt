@@ -122,8 +122,10 @@ def upload(jobs):
         connection = HTTPConnection(config[':host'],
                                     port=config[':port'])
         if ':username' in config and ':password' in config:
-            token = base64.b64encode('{}:{}'.format(config[':username'],
-                                                    config[':password']))
+            auth = '{}:{}'.format(config[':username'], config[':password'])
+            if not isinstance(auth, bytes):
+                auth = auth.encode('UTF-8')
+            token = base64.b64encode(auth)
             headers['Authorization'] = 'Basic {}'.format(token)
 
     for job_id, job in jobs:
