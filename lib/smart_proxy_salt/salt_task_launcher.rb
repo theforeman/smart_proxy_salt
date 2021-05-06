@@ -1,4 +1,4 @@
-module SmartProxySaltCore
+module Proxy::Salt
   # Implements the TaskLauncher::Batch for Salt
   class SaltTaskLauncher < ForemanTasksCore::TaskLauncher::Batch
     # Implements the Runner::Action for Salt
@@ -8,7 +8,7 @@ module SmartProxySaltCore
           :step_id => run_step_id,
           :uuid => execution_plan_id
         }
-        ::SmartProxySaltCore::SaltRunner.new(
+        ::Proxy::Salt::SaltRunner.new(
           input.merge(additional_options),
           :suspended_action => suspended_action
         )

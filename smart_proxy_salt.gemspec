@@ -21,4 +21,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('rake', '~> 13')
   s.add_development_dependency('rubocop', '0.50.0')
   s.add_development_dependency('rack-test', '~> 0')
+
+  s.add_runtime_dependency('foreman-tasks-core', '>= 0.3.1')
+  s.add_runtime_dependency('foreman_remote_execution_core', '>= 0.1.2')
 end

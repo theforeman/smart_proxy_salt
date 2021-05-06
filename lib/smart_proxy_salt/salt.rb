@@ -15,10 +15,20 @@ module Proxy
       default_settings :autosign_file      => '/etc/salt/autosign.conf',
                        :autosign_key_file  => '/var/lib/foreman-proxy/salt/grains/autosign_key',
                        :salt_command_user  => 'root',
-                       :use_api            => false
+                       :use_api            => false,
+                       :saltfile           => '/etc/foreman-proxy/settings.d/salt.saltfile'
 
       http_rackup_path File.expand_path('salt_http_config.ru', File.expand_path('../', __FILE__))
       https_rackup_path File.expand_path('salt_http_config.ru', File.expand_path('../', __FILE__))
+
+      after_activation do
+        require 'foreman_tasks_core'
+        require 'foreman_remote_execution_core'
+        require 'smart_proxy_salt/salt_runner'
+        require 'smart_proxy_salt/salt_task_launcher'
+
+        SmartProxyDynflowCore::TaskLauncherRegistry.register('salt', SaltTaskLauncher)
+      end
     end
 
     class << self

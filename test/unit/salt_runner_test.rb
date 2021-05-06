@@ -2,9 +2,9 @@ if RUBY_VERSION >= '2.3.0'
   require 'test_helper'
   require 'dynflow'
   require 'foreman_remote_execution_core'
-  require 'smart_proxy_salt_core'
+  require 'smart_proxy_salt/salt_runner'
 
-  module SmartProxySaltCore
+  module Proxy::Salt
     class SaltRunnerTest < Test::Unit::TestCase
       def test_capture_jid
         data = <<-TESTDATA
@@ -37,7 +37,7 @@ if RUBY_VERSION >= '2.3.0'
 
       def test_generate_command
         saltfile = '/tmp/saltfile'
-        SmartProxySaltCore.expects(:settings).returns(:saltfile => saltfile)
+        Plugin.expects(:settings).returns(:saltfile => saltfile)
         runner = SaltRunner.new({ 'name' => 'a-host', 'script' => 'ls -la /' },
                                 :suspended_action => nil)
         File.expects(:file?).with(saltfile).returns(true)
