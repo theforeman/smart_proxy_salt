@@ -9,7 +9,7 @@ module Proxy
     class Api < ::Sinatra::Base
       include ::Proxy::Log
       helpers ::Proxy::Helpers
-      authorize_with_ssl_client
+      authorize_with_trusted_hosts
 
       post '/autosign/:host' do
         content_type :json
