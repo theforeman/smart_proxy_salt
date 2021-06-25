@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/salt_python_wrapper
 # Uploads reports from the Salt job cache to Foreman
 
 from __future__ import print_function
