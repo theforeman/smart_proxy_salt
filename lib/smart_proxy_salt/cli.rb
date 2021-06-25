@@ -14,44 +14,43 @@ module Proxy
           Proxy::Salt::Plugin.settings.autosign_file
         end
 
-        def autosign_create(host)
-          FileUtils.touch(autosign_file) unless File.exist?(autosign_file)
-
-          autosign = open(autosign_file, File::RDWR)
-
-          found = false
-          autosign.each_line { |line| found = true if line.chomp == host }
-          autosign.puts host unless found
-          autosign.close
-
-          result = { :message => "Added #{host} to autosign" }
-          logger.info result[:message]
-          result
+        def autosign_key_file
+          Proxy::Salt::Plugin.settings.autosign_key_file
         end
 
-        def autosign_remove(host)
-          raise "No such file #{autosign_file}" unless File.exist?(autosign_file)
-
-          found = false
-          entries = open(autosign_file, File::RDONLY).readlines.collect do |l|
-            if l.chomp != host
-              l
-            else
-              found = true
-              nil
-            end
-          end.uniq.compact
-          if found
-            autosign = open(autosign_file, File::TRUNC | File::RDWR)
-            autosign.write entries.join("\n")
-            autosign.write "\n"
-            autosign.close
-            result = { :message => "Removed #{host} from autosign" }
-            logger.info result[:message]
-            result
+        def autosign_create_hostname(hostname)
+          if append_value_to_file(autosign_file, hostname)
+            { message: 'Added hostname successfully.' }
           else
-            logger.info "Attempt to remove nonexistant client autosign for #{host}"
-            raise Proxy::Salt::NotFound.new("Attempt to remove nonexistant client autosign for #{host}")
+            { message: 'Failed to add hostname.' \
+                       ' See smart proxy error log for more information.' }
+          end
+        end
+
+        def autosign_remove_hostname(hostname)
+          if remove_value_from_file(autosign_file, hostname)
+            { message: 'Removed hostname successfully.' }
+          else
+            { message: 'Failed to remove hostname.' \
+                       ' See smart proxy error log for more information.' }
+          end
+        end
+
+        def autosign_create_key(key)
+          if append_value_to_file(autosign_key_file, key)
+            { message: 'Added key successfully.' }
+          else
+            { message: 'Failed to add key.' \
+                       ' See smart proxy error log for more information.' }
+          end
+        end
+
+        def autosign_remove_key(key)
+          if remove_value_from_file(autosign_key_file, key)
+            { message: 'Removed key successfully.' }
+          else
+            { message: 'Failed to remove key.' \
+                       ' See smart proxy error log for more information.' }
           end
         end
 
@@ -60,6 +59,57 @@ module Proxy
           File.read(autosign_file).split("\n").reject do |v|
             v =~ /^\s*#.*|^$/ ## Remove comments and empty lines
           end.map(&:chomp)
+        end
+
+        def append_value_to_file(filepath, value)
+          result = false
+          begin
+            raise "No such file: #{filepath}" unless File.exist?(filepath)
+
+            file = open(filepath, File::RDWR)
+            found = false
+            file.each_line { |line| found = true if line.chomp == value }
+            file.puts value unless found
+            file.close
+
+            logger.info "Added an entry to '#{filepath}' successfully."
+            result = true
+          rescue SystemCallError => e
+            logger.info "Attempted to add an entry to '#{filepath}', but an exception occurred: #{e}"
+          end
+          result
+        end
+
+        def remove_value_from_file(filepath, value)
+          result = false
+          begin
+            raise "No such file: #{filepath}" unless File.exist?(filepath)
+
+            found = false
+            entries = open(filepath, File::RDONLY).readlines.collect do |l|
+              entry = l.chomp
+              if entry == value
+                found = true
+                nil
+              elsif entry == ""
+                nil
+              else
+                l
+              end
+            end.uniq.compact
+            if found
+              file = open(filepath, File::TRUNC | File::RDWR)
+              file.write entries.join()
+              file.close
+              logger.info "Removed an entry from '#{filepath}' successfully."
+              result = true
+            else
+              raise Proxy::Salt::NotFound.new("Attempt to remove non-existent entry.")
+            end
+          rescue SystemCallError => e
+            logger.info "Attempted to remove an entry from '#{filepath}', but an exception occurred: #{e}"
+          end
+          result
         end
 
         def highstate(host)

@@ -13,6 +13,7 @@ module Proxy
       plugin 'salt', Proxy::Salt::VERSION
 
       default_settings :autosign_file      => '/etc/salt/autosign.conf',
+                       :autosign_key_file  => '/var/lib/foreman-proxy/salt/grains/autosign_key',
                        :salt_command_user  => 'root',
                        :use_api            => false
 
