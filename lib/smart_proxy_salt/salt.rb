@@ -22,12 +22,11 @@ module Proxy
       https_rackup_path File.expand_path('salt_http_config.ru', File.expand_path('../', __FILE__))
 
       after_activation do
-        require 'foreman_tasks_core'
-        require 'foreman_remote_execution_core'
+        require 'smart_proxy_dynflow'
         require 'smart_proxy_salt/salt_runner'
         require 'smart_proxy_salt/salt_task_launcher'
 
-        SmartProxyDynflowCore::TaskLauncherRegistry.register('salt', SaltTaskLauncher)
+        Proxy::Dynflow::TaskLauncherRegistry.register('salt', SaltTaskLauncher)
       end
     end
 

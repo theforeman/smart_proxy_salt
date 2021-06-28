@@ -1,7 +1,7 @@
 if RUBY_VERSION >= '2.3.0'
   require 'test_helper'
   require 'dynflow'
-  require 'foreman_remote_execution_core'
+  require 'smart_proxy_dynflow/runner'
   require 'smart_proxy_salt/salt_runner'
 
   module Proxy

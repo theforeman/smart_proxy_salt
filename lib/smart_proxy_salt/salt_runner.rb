@@ -1,9 +1,9 @@
-require 'foreman_tasks_core/runner/command_runner'
+require 'smart_proxy_dynflow/runner/command_runner'
 
 module Proxy
   module Salt
     # Implements the SaltRunner to be used by foreman_remote_execution
-    class SaltRunner < ForemanTasksCore::Runner::CommandRunner
+    class SaltRunner < Proxy::Dynflow::Runner::CommandRunner
       DEFAULT_REFRESH_INTERVAL = 1
 
       attr_reader :jid
