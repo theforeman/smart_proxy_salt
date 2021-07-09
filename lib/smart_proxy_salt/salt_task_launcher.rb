@@ -1,3 +1,5 @@
+require 'smart_proxy_dynflow/task_launcher'
+
 module Proxy
   module Salt
     # Implements the TaskLauncher::Batch for Salt
