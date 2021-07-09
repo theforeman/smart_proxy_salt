@@ -18,14 +18,15 @@ module Proxy
                        :use_api            => false,
                        :saltfile           => '/etc/foreman-proxy/settings.d/salt.saltfile'
 
-      http_rackup_path File.expand_path('salt_http_config.ru', File.expand_path('../', __FILE__))
-      https_rackup_path File.expand_path('salt_http_config.ru', File.expand_path('../', __FILE__))
+      rackup_path File.expand_path('salt_http_config.ru', __dir__)
 
-      after_activation do
+      load_classes do
         require 'smart_proxy_dynflow'
         require 'smart_proxy_salt/salt_runner'
         require 'smart_proxy_salt/salt_task_launcher'
+      end
 
+      load_dependency_injection_wirings do |_container_instance, _settings|
         Proxy::Dynflow::TaskLauncherRegistry.register('salt', SaltTaskLauncher)
       end
     end
