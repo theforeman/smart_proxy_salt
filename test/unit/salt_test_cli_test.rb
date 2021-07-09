@@ -107,7 +107,7 @@ class SaltCLITest < Test::Unit::TestCase
     post '/autosign/bdf9f052723195aa35f94a4bc5512fdc'
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
     msg = JSON.parse(last_response.body)
-    assert_match(/Attempt to add autosign key bdf9f052723195aa35f94a4bc5512fdc but exception happend/, msg['message'])
+    assert_match(/Failed to add hostname. See smart proxy error log for more information./, msg['message'])
   end
 
   def test_autosign_list
@@ -125,19 +125,19 @@ class SaltCLITest < Test::Unit::TestCase
   def test_autosign_create
     post '/autosign/bdf9f052723195aa35f94a4bc5512fdc'
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
-    assert_equal('{"message":"Added bdf9f052723195aa35f94a4bc5512fdc to autosign"}', last_response.body)
+    assert_equal('{"message":"Added hostname successfully."}', last_response.body)
   end
 
   def test_autosign_delete
     delete '/autosign/bdf9f052723195aa35f94a4bc5512fdc'
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
-    assert_equal('{"message":"Removed bdf9f052723195aa35f94a4bc5512fdc from autosign"}', last_response.body)
+    assert_equal('{"message":"Removed hostname successfully."}', last_response.body)
   end
 
   def test_autosign_delete_unknown_host
     delete '/autosign/unknown_host'
     assert last_response.not_found?, "Last response should fail but was ok: #{last_response.body}"
-    assert_equal('Attempt to remove nonexistant autosign key unknown_host', last_response.body)
+    assert_equal('Attempt to remove non-existent entry.', last_response.body)
   end
 end
 # rubocop:enable ClassLength

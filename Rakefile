@@ -5,11 +5,9 @@ require 'rake/testtask'
 require 'rake/clean'
 CLOBBER.include 'pkg'
 
-%w[smart_proxy_salt smart_proxy_salt_core].each do |plugin|
-  namespace plugin do
-    require 'bundler/gem_helper'
-    Bundler::GemHelper.install_tasks(:name => plugin)
-  end
+namespace 'smart_proxy_salt' do
+  require 'bundler/gem_helper'
+  Bundler::GemHelper.install_tasks(:name => 'smart_proxy_salt')
 end
 
 desc 'Default: run unit tests.'
