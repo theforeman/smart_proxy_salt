@@ -18,6 +18,8 @@ module Proxy
                        :use_api            => false,
                        :saltfile           => '/etc/foreman-proxy/settings.d/salt.saltfile'
 
+      requires :dynflow, '>= 0.5.0'
+
       rackup_path File.expand_path('salt_http_config.ru', __dir__)
 
       load_classes do
