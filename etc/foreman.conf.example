@@ -1,0 +1,65 @@
+# /etc/salt/master.d/foreman.config Example configuration
+#
+# This file summarizes configurations for the salt-master. Modify directories and
+# parameters to fit your setup. When you're done, remove the .example from the
+# filename so the salt-master will make use of it.
+# Have a look at the [Foreman Salt Plugin Documentation](https://theforeman.org/plugins/foreman_salt/) for detailed explanations.
+#
+# After editing this file, run the following command to active the changes:
+# $ systemctl restart salt-master
+
+
+##
+# Autosign
+autosign_grains_dir: /var/lib/foreman-proxy/salt/grains
+autosign_file: /etc/salt/autosign.conf
+# Uncomment the next line to make use of the autosign host name file (not recommended)
+# permissive_pki_access: True
+
+
+##
+# Node classifier
+master_tops:
+  ext_nodes: /usr/bin/foreman-node
+
+
+##
+# Pillar data access
+ext_pillar:
+  - puppet: /usr/bin/foreman-node
+
+
+##
+# Salt API access
+external_auth:
+  pam:
+    saltuser: # Username of your salt user
+      - '@runner'
+
+rest_cherrypy:
+  port: 9191
+  ssl_key: /etc/puppet/example.key # Add the path to your Puppet ssl key here
+  ssl_crt: /etc/puppet/example.crt # Add the path to your Puppet ssl certificate here
+
+
+##
+# Remote execution provider
+publisher_acl:
+  foreman-proxy:
+    - state.template_str
+
+
+##
+# Salt environment (optional)
+file_roots:
+  base:
+   - /srv/salt
+
+ 
+##
+# Reactors
+reactor:
+  - 'salt/auth': # Autosign reactor
+    - /var/lib/foreman-proxy/salt/reactors/foreman_minion_auth.sls
+  - 'salt/job/*/ret/*': # Report reactor
+    - /var/lib/foreman-proxy/salt/reactors/foreman_report_upload.sls
