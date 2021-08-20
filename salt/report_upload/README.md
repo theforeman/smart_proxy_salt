@@ -10,10 +10,15 @@ This README, handles the second option and how to configure it
 Add the content of 'master.snippet' to '/etc/salt/master' which configures a reactor. 
 In case there is already a reactor configured, you need to adapt it using the options mentioned in 'master.snippet'.
 
-In case '/srv/salt' is configured as 'file_roots' in your '/etc/salt/master' config, setup the necessary salt state file and Salt runner functions:
+Check the reactor file to be in the following folder (or a different one depending on your master configuration):
 
 ```
-/srv/salt/foreman_report_upload.sls
+/var/lib/foreman-proxy/salt/reactors/foreman_report_upload.sls
+```
+
+In case '/srv/salt' is configured as 'file_roots' in your '/etc/salt/master' config, setup the necessary Salt runner:
+
+```
 /srv/salt/_runners/foreman_report_upload.py
 ```
 
