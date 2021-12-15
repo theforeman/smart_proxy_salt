@@ -1,4 +1,5 @@
-#!/usr/bin/salt_python_wrapper
+#!/bin/bash
+"exec" "$(command -v python3 || command -v python)" "$0" "$@"
 # Uploads reports from the Salt job cache to Foreman
 
 from __future__ import print_function
