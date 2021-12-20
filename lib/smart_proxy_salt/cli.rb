@@ -62,54 +62,42 @@ module Proxy
         end
 
         def append_value_to_file(filepath, value)
-          result = false
-          begin
-            raise "No such file: #{filepath}" unless File.exist?(filepath)
-
-            file = open(filepath, File::RDWR)
-            found = false
-            file.each_line { |line| found = true if line.chomp == value }
-            file.puts value unless found
-            file.close
-
-            logger.info "Added an entry to '#{filepath}' successfully."
-            result = true
-          rescue SystemCallError => e
-            logger.info "Attempted to add an entry to '#{filepath}', but an exception occurred: #{e}"
+          File.open(filepath, File::CREAT|File::RDWR) do |file|
+            unless file.any? { |line| line.chomp == value}
+              file.puts value
+            end
           end
-          result
+          logger.info "Added an entry to '#{filepath}' successfully."
+          true
+        rescue IOError => e
+          logger.info "Attempted to add an entry to '#{filepath}', but an exception occurred: #{e}"
+          false
         end
 
         def remove_value_from_file(filepath, value)
-          result = false
-          begin
-            raise "No such file: #{filepath}" unless File.exist?(filepath)
 
-            found = false
-            entries = open(filepath, File::RDONLY).readlines.collect do |l|
-              entry = l.chomp
-              if entry == value
-                found = true
-                nil
-              elsif entry == ""
-                nil
-              else
-                l
-              end
-            end.uniq.compact
-            if found
-              file = open(filepath, File::TRUNC | File::RDWR)
-              file.write entries.join()
-              file.close
-              logger.info "Removed an entry from '#{filepath}' successfully."
-              result = true
+          return true unless File.exist?(filepath)
+
+          found = false
+          entries = File.readlines(filepath).collect do |line|
+            entry = line.chomp
+            if entry == value
+              found = true
+              nil
+            elsif entry == ""
+              nil
             else
-              raise Proxy::Salt::NotFound.new("Attempt to remove non-existent entry.")
+              line
             end
-          rescue SystemCallError => e
-            logger.info "Attempted to remove an entry from '#{filepath}', but an exception occurred: #{e}"
+          end.uniq.compact
+          if found
+            File.write(filepath, entries.join())
+            logger.info "Removed an entry from '#{filepath}' successfully."
           end
-          result
+          true
+        rescue IOError => e
+          logger.info "Attempted to remove an entry from '#{filepath}', but an exception occurred: #{e}"
+          false
         end
 
         def highstate(host)
