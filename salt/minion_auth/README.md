@@ -17,13 +17,13 @@ If '/srv/salt' is configured as 'file_roots' in your '/etc/salt/master' config, 
 /srv/salt/_runners/foreman_https.py
 ```
 
-Check if the reactor ('foreman_minion_auth.sls') is at the appropriated location and set the correct smart proxy address in the reactor file:
+Check if the reactor ('foreman_minion_auth.sls') is at the appropriated location:
 
 ```
 /var/lib/foreman-proxy/salt/reactors/foreman_minion_auth.sls
 ```
 
-After changing the Salt master, restart the salt-master service:
+Restart the salt-master service:
 
 ```
 systemctl restart salt-master
