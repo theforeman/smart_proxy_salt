@@ -81,7 +81,7 @@ def create_report(json_str):
                 return {'job':
                      {
                        'result': {
-                         msg['id']: entry['changes']['ret'],
+                         msg['id']: next(iter(entry['changes'].values())),
                        },
                        'function': 'state.highstate',
                        'job_id': msg['jid']
