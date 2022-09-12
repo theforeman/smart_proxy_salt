@@ -4,13 +4,16 @@ Uploads reports from the Salt job cache to Foreman
 '''
 from __future__ import absolute_import, print_function, unicode_literals
 
+LAST_UPLOADED = '/etc/salt/last_uploaded'
 FOREMAN_CONFIG = '/etc/salt/foreman.yaml'
+LOCK_FILE = '/var/lock/salt-report-upload.lock'
 
 try:
     from http.client import HTTPConnection, HTTPSConnection
 except ImportError:
     from httplib import HTTPSConnection, HTTPSConnection
 
+import io
 import ssl
 import json
 import yaml
@@ -24,10 +27,19 @@ import logging
 log = logging.getLogger(__name__)
 
 
+if sys.version_info.major == 3:
+    unicode = str
+
+
 def salt_config():
     with open(FOREMAN_CONFIG, 'r') as f:
         config = yaml.load(f.read())
     return config
+
+
+def write_last_uploaded(last_uploaded):
+    with io.open(LAST_UPLOADED, 'w+') as f:
+        f.write(unicode(last_uploaded))
 
 
 def upload(report):
@@ -55,6 +67,7 @@ def upload(report):
     response = connection.getresponse()
 
     if response.status == 200:
+        write_last_uploaded(report['job']['job_id'])
         info_msg = 'Success {0}: {1}'.format(report['job']['job_id'], response.read())
         log.info(info_msg)
     else:
@@ -90,6 +103,18 @@ def create_report(json_str):
     raise Exception('No state.highstate found')
 
 
+def get_lock():
+    if os.path.isfile(LOCK_FILE):
+        raise Exception("Unable to obtain lock.")
+    else:
+        io.open(LOCK_FILE, 'w+').close()
+
+
+def release_lock():
+    if os.path.isfile(LOCK_FILE):
+        os.remove(LOCK_FILE)
+
+
 def now(highstate):
     '''
     Upload a highstate to Foreman
@@ -100,7 +125,10 @@ def now(highstate):
 
     try:
         report = create_report(base64.b64decode(highstate))
+        get_lock()
         upload(report)
     except Exception as exc:
         log.error('Exception encountered: %s', exc)
+    finally:
+        release_lock()
 
