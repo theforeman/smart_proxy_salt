@@ -1,10 +1,10 @@
 # Foreman Salt Report Upload
 
 Currently, there are two possibilites to upload the salt report to Foreman:
-1. Use /usr/sbin/upload-salt-reports which is called by a cron job every 10 minutes by default
-2. Upload the report immediately by using a Salt Reactor.
+1. Upload the report immediately by using a Salt Reactor (recommended).
+2. Use /usr/sbin/upload-salt-reports manually (or set up a cronjob, see `/cron/smart_proxy_salt`).
 
-This README, handles the second option and how to configure it
+This README handles the first option and how to configure it
 
 ## Setup
 Add the content of 'master.snippet' to '/etc/salt/master' which configures a reactor. 
