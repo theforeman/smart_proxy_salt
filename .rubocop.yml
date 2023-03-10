@@ -1,13 +1,20 @@
+inherit_from: .rubocop_todo.yml
+
 AllCops:
-  TargetRubyVersion: 2.0
+  TargetRubyVersion: '2.7'
 
 Layout/DotPosition:
   EnforcedStyle: 'trailing'
 
 Lint/RescueException:
   Enabled: false
+
 Metrics/AbcSize:
   Max: 50
+
+Metrics/ClassLength:
+  Exclude:
+    - test/**/*.rb
 
 Metrics/CyclomaticComplexity:
   Max: 15
@@ -19,7 +26,7 @@ Metrics/MethodLength:
   Max: 30
 
 Metrics/ModuleLength:
-  Max: 150
+  Enabled: false
 
 Metrics/PerceivedComplexity:
   Max: 15
@@ -29,7 +36,7 @@ Naming/FileName:
     - 'bin/foreman-node'
 
 Style/HashSyntax:
-  EnforcedStyle: hash_rockets
+  Enabled: false
 
 Style/RaiseArgs:
   EnforcedStyle: compact

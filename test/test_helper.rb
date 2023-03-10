@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test/unit'
 $LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
 

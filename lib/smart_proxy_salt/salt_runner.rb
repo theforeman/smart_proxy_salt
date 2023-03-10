@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'smart_proxy_dynflow/runner/base'
 require 'smart_proxy_dynflow/runner/command_runner'
 

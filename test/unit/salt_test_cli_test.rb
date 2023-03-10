@@ -10,7 +10,6 @@ require 'smart_proxy_salt/salt'
 require 'smart_proxy_salt/salt_api'
 
 # smart_proxy_salt tests running on CLI
-# rubocop:disable ClassLength
 class SaltCLITest < Test::Unit::TestCase
   include Rack::Test::Methods
 
@@ -79,11 +78,11 @@ class SaltCLITest < Test::Unit::TestCase
     }', system('/bin/true')) # system('/bin/true') is necessary so that $CHILD_STATUS is set to 0
 
     expected = {
-      'centos8-devel'  => { 'state' => 'accepted',   'fingerprint' => '47:8f:ba:ed:99:44:da:5a:26:f9:34:a6:36:d8:ab:50:b8:11:63:fd:21:95:22:91:d0:8b:1c:16:a3:ed:22:b7' },
-      'centos7.devel'  => { 'state' => 'accepted',   'fingerprint' => 'cd:87:a0:b6:cf:ce:d1:8a:a6:22:8c:b8:30:d1:22:0f:43:45:c5:08:3b:01:d2:81:cf:72:6f:fe:36:d7:59:bf' },
-      'ubuntu18.devel' => { 'state' => 'rejected',   'fingerprint' => 'dd:0f:6b:88:1d:56:a3:de:c4:f3:d9:70:35:21:3f:55:de:c9:70:c3:b3:62:71:01:6d:2a:d4:6e:4e:2f:ab:d7' },
-      'rhel7.devel'    => { 'state' => 'rejected',   'fingerprint' => '80:88:11:df:4a:6c:69:17:73:f5:10:22:14:de:a2:76:ea:ab:0e:41:47:41:27:1b:dc:6c:5e:10:ab:1f:d7:c3' },
-      'debian9.devel'  => { 'state' => 'unaccepted', 'fingerprint' => '23:91:4e:c1:a2:99:6b:b4:48:43:0c:7d:88:ea:22:5e:22:7e:f5:f7:ab:e1:9e:52:c1:20:75:a0:1a:d5:47:22' }
+      'centos8-devel' => { 'state' => 'accepted',   'fingerprint' => '47:8f:ba:ed:99:44:da:5a:26:f9:34:a6:36:d8:ab:50:b8:11:63:fd:21:95:22:91:d0:8b:1c:16:a3:ed:22:b7' },
+      'centos7.devel' => { 'state' => 'accepted',   'fingerprint' => 'cd:87:a0:b6:cf:ce:d1:8a:a6:22:8c:b8:30:d1:22:0f:43:45:c5:08:3b:01:d2:81:cf:72:6f:fe:36:d7:59:bf' },
+      'ubuntu18.devel' => { 'state' => 'rejected', 'fingerprint' => 'dd:0f:6b:88:1d:56:a3:de:c4:f3:d9:70:35:21:3f:55:de:c9:70:c3:b3:62:71:01:6d:2a:d4:6e:4e:2f:ab:d7' },
+      'rhel7.devel' => { 'state' => 'rejected', 'fingerprint' => '80:88:11:df:4a:6c:69:17:73:f5:10:22:14:de:a2:76:ea:ab:0e:41:47:41:27:1b:dc:6c:5e:10:ab:1f:d7:c3' },
+      'debian9.devel' => { 'state' => 'unaccepted', 'fingerprint' => '23:91:4e:c1:a2:99:6b:b4:48:43:0c:7d:88:ea:22:5e:22:7e:f5:f7:ab:e1:9e:52:c1:20:75:a0:1a:d5:47:22' }
     }
 
     get '/key'
@@ -112,9 +111,9 @@ class SaltCLITest < Test::Unit::TestCase
     Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => true, :autosign_file => 'create_non_existent_file')
     post '/autosign/bdf9f052723195aa35f94a4bc5512fdc'
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
-    File.open("create_non_existent_file") do |file|
-        lines = file.readlines
-        assert_includes(lines, "bdf9f052723195aa35f94a4bc5512fdc\n")
+    File.open('create_non_existent_file') do |file|
+      lines = file.readlines
+      assert_includes(lines, "bdf9f052723195aa35f94a4bc5512fdc\n")
     end
   end
 
@@ -122,7 +121,7 @@ class SaltCLITest < Test::Unit::TestCase
     Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => true, :autosign_file => '/cannot/create/file')
     post '/autosign/bdf9f052723195aa35f94a4bc5512fdc'
     assert_equal(last_response.status, 406)
-    assert(last_response.body.include? 'Failed to create autosign for bdf9f052723195aa35f94a4bc5512fdc')
+    assert_includes(last_response.body, 'Failed to create autosign for bdf9f052723195aa35f94a4bc5512fdc')
   end
 
   def test_autosign_list
@@ -160,8 +159,8 @@ class SaltCLITest < Test::Unit::TestCase
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
     assert_equal('{"message":"Added key successfully."}', last_response.body)
     File.open(@autosign_key_file_path) do |file|
-        lines = file.readlines
-        assert_includes(lines, "lulz\n")
+      lines = file.readlines
+      assert_includes(lines, "lulz\n")
     end
   end
 
@@ -171,9 +170,9 @@ class SaltCLITest < Test::Unit::TestCase
     assert_equal('{"message":"Added key successfully."}', last_response.body)
     post '/autosign_key/lulz'
     File.open(@autosign_key_file_path) do |file|
-        lines = file.readlines
-        assert_equal(lines[-1], "lulz\n")
-        assert_equal(lines.length, 3)
+      lines = file.readlines
+      assert_equal(lines[-1], "lulz\n")
+      assert_equal(lines.length, 3)
     end
   end
 
@@ -182,9 +181,9 @@ class SaltCLITest < Test::Unit::TestCase
     post '/autosign_key/lulz'
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
     assert_equal('{"message":"Added key successfully."}', last_response.body)
-    File.open("create_me") do |file|
-        lines = file.readlines
-        assert_includes(lines, "lulz\n")
+    File.open('create_me') do |file|
+      lines = file.readlines
+      assert_includes(lines, "lulz\n")
     end
   end
 
@@ -192,7 +191,7 @@ class SaltCLITest < Test::Unit::TestCase
     Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => true, :autosign_key_file => '/cannot/create/file')
     post '/autosign_key/lulz'
     assert_equal(406, last_response.status)
-    assert(last_response.body.include? 'Failed to create autosign key lulz')
+    assert(last_response.body.include?('Failed to create autosign key lulz'))
   end
 
   def test_autosign_key_delete
@@ -200,8 +199,8 @@ class SaltCLITest < Test::Unit::TestCase
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
     assert_equal('{"message":"Removed key successfully."}', last_response.body)
     File.open(@autosign_key_file_path) do |file|
-        lines = file.readlines
-        assert_not_include(lines, "dfby1j37lbva\n")
+      lines = file.readlines
+      assert_not_include(lines, "dfby1j37lbva\n")
     end
   end
 
@@ -217,6 +216,4 @@ class SaltCLITest < Test::Unit::TestCase
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
     assert_equal('{"message":"Removed key successfully."}', last_response.body)
   end
-
 end
-# rubocop:enable ClassLength

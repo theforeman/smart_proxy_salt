@@ -23,6 +23,7 @@ module Proxy
 
           files.each do |file|
             next unless file =~ /\.sls\Z/ && file != 'top.sls'
+
             states << file.gsub('.sls', '').gsub('/init', '').chomp('/').tr('/', '.')
           end
 

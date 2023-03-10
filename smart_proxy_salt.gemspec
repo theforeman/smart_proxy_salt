@@ -15,12 +15,6 @@ Gem::Specification.new do |s|
   s.executables      = s.files.grep(%r{^bin/}) { |file| File.basename(file) }
   s.homepage         = 'https://github.com/theforeman/smart_proxy_salt'
   s.license          = 'GPL-3.0'
-  s.add_development_dependency('test-unit', '~> 2')
-  s.add_development_dependency('mocha', '~> 1')
-  s.add_development_dependency('webmock', '~> 1')
-  s.add_development_dependency('rake', '~> 13')
-  s.add_development_dependency('rubocop', '0.50.0')
-  s.add_development_dependency('rack-test', '~> 0')
-
+  s.required_ruby_version = '>= 2.7', '< 4'
   s.add_runtime_dependency('smart_proxy_dynflow', '>= 0.5.0')
 end
