@@ -12,11 +12,11 @@ module Proxy
     class Plugin < ::Proxy::Plugin
       plugin 'salt', Proxy::Salt::VERSION
 
-      default_settings :autosign_file      => '/etc/salt/autosign.conf',
-                       :autosign_key_file  => '/var/lib/foreman-proxy/salt/grains/autosign_key',
-                       :salt_command_user  => 'root',
-                       :use_api            => false,
-                       :saltfile           => '/etc/foreman-proxy/settings.d/salt.saltfile'
+      default_settings :autosign_file => '/etc/salt/autosign.conf',
+                       :autosign_key_file => '/var/lib/foreman-proxy/salt/grains/autosign_key',
+                       :salt_command_user => 'root',
+                       :use_api => false,
+                       :saltfile => '/etc/foreman-proxy/settings.d/salt.saltfile'
 
       requires :dynflow, '>= 0.5.0'
 

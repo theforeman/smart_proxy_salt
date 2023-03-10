@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 require 'dynflow'
 require 'smart_proxy_dynflow/runner'
@@ -17,7 +19,7 @@ module Proxy
 
         258b7c8b6c9d:
             True
-      TESTDATA
+        TESTDATA
         runner = SaltRunner.new({}, :suspended_action => nil)
         assert_nil runner.jid
         runner.publish_data(data, 'stdout')

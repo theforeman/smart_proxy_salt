@@ -45,7 +45,7 @@ end
 
 def get_grains(minion)
   grains = {
-    :name  => minion,
+    :name => minion,
     :facts => plain_grains(minion).merge(:_timestamp => Time.now, :_type => 'foreman_salt')
   }
 
@@ -94,9 +94,10 @@ end
 def plainify(hash, prefix = nil)
   result = []
   hash.each_pair do |key, value|
-    if value.is_a?(Hash)
+    case value
+    when Hash
       result.push plainify(value, get_key(key, prefix))
-    elsif value.is_a?(Array)
+    when Array
       result.push plainify(array_to_hash(value), get_key(key, prefix))
     else
       new = {}
@@ -169,12 +170,14 @@ def enc(minion)
   res = http.start { |conn| conn.request(req) }
 
   raise "Error retrieving node #{minion}: #{res.class}\nCheck Foreman's /var/log/foreman/production.log for more information." unless res.code == '200'
+
   res.body
 end
 
 minion = ARGV[0] || raise('Must provide minion as an argument')
 
 raise 'Invalid hostname' unless valid_hostname? minion
+
 begin
   result = ''
 

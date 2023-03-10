@@ -56,16 +56,15 @@ module Proxy
 
         def autosign_list
           return [] unless File.exist?(autosign_file)
+
           File.read(autosign_file).split("\n").reject do |v|
             v =~ /^\s*#.*|^$/ ## Remove comments and empty lines
           end.map(&:chomp)
         end
 
         def append_value_to_file(filepath, value)
-          File.open(filepath, File::CREAT|File::RDWR) do |file|
-            unless file.any? { |line| line.chomp == value}
-              file.puts value
-            end
+          File.open(filepath, File::CREAT | File::RDWR) do |file|
+            file.puts value unless file.any? { |line| line.chomp == value }
           end
           logger.info "Added an entry to '#{filepath}' successfully."
           true
@@ -75,7 +74,6 @@ module Proxy
         end
 
         def remove_value_from_file(filepath, value)
-
           return true unless File.exist?(filepath)
 
           found = false
@@ -84,14 +82,14 @@ module Proxy
             if entry == value
               found = true
               nil
-            elsif entry == ""
+            elsif entry == ''
               nil
             else
               line
             end
           end.uniq.compact
           if found
-            File.write(filepath, entries.join())
+            File.write(filepath, entries.join)
             logger.info "Removed an entry from '#{filepath}' successfully."
           end
           true
