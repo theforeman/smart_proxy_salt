@@ -12,10 +12,6 @@ Lint/RescueException:
 Metrics/AbcSize:
   Max: 50
 
-Metrics/ClassLength:
-  Exclude:
-    - test/**/*.rb
-
 Metrics/CyclomaticComplexity:
   Max: 15
 
@@ -31,9 +27,16 @@ Metrics/ModuleLength:
 Metrics/PerceivedComplexity:
   Max: 15
 
+Metrics/ClassLength:
+  Enabled: false
+
 Naming/FileName:
   Exclude:
     - 'bin/foreman-node'
+
+Naming/MethodParameterName:
+  Exclude:
+    - 'lib/smart_proxy_salt/salt.rb'
 
 Style/HashSyntax:
   Enabled: false
@@ -46,3 +49,7 @@ Style/SignalException:
 
 Style/SymbolArray:
   EnforcedStyle: brackets
+
+Style/OptionalBooleanParameter:
+  Exclude:
+    - 'lib/smart_proxy_salt/cli.rb'
