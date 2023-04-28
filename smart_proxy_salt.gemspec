@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require File.expand_path('../lib/smart_proxy_salt/version', __FILE__)
+require File.expand_path('lib/smart_proxy_salt/version', __dir__)
 
 Gem::Specification.new do |s|
   s.name             = 'smart_proxy_salt'
