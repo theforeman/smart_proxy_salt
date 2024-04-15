@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version          = Proxy::Salt::VERSION
 
   s.summary          = "SaltStack Plug-In for Foreman's Smart Proxy"
-  s.description      = "SaltStack Plug-In for Foreman's Smart Proxy"
+  s.description      = "This plug-in adds support for Salt to Foreman's Smart Proxy"
   s.authors          = ['Michael Moll', 'Stephen Benjamin']
   s.email            = 'foreman-dev@googlegroups.com'
   s.extra_rdoc_files = ['README.md', 'LICENSE']
@@ -16,5 +16,5 @@ Gem::Specification.new do |s|
   s.homepage         = 'https://github.com/theforeman/smart_proxy_salt'
   s.license          = 'GPL-3.0'
   s.required_ruby_version = '>= 2.7', '< 4'
-  s.add_runtime_dependency('smart_proxy_dynflow', '>= 0.5.0')
+  s.add_runtime_dependency('smart_proxy_dynflow', '~> 0.5', '>= 0.5.0')
 end
