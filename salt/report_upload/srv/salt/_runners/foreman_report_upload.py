@@ -33,7 +33,7 @@ if sys.version_info.major == 3:
 
 def salt_config():
     with open(FOREMAN_CONFIG, 'r') as f:
-        config = yaml.load(f.read())
+        config = yaml.safe_load(f.read())
     return config
 
 
