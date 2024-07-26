@@ -51,19 +51,15 @@ def upload(report):
         ctx = ssl.create_default_context()
         ctx.load_cert_chain(certfile=config[':ssl_cert'], keyfile=config[':ssl_key'])
         if config[':ssl_ca']:
-          ctx.load_verify_locations(cafile=config[':ssl_ca'])
-        connection = HTTPSConnection(config[':host'],
-                port=config[':port'], context=ctx)
+            ctx.load_verify_locations(cafile=config[':ssl_ca'])
+        connection = HTTPSConnection(config[':host'], port=config[':port'], context=ctx)
     else:
-        connection = HTTPConnection(config[':host'],
-                port=config[':port'])
+        connection = HTTPConnection(config[':host'], port=config[':port'])
         if ':username' in config and ':password' in config:
-            token = base64.b64encode('{}:{}'.format(config[':username'],
-                                                    config[':password']))
-            headers['Authorization'] = 'Basic {}'.format(token)
+            token = base64.b64encode('{}:{}'.format(config[':username'], config[':password']).encode('utf-8'))
+            headers['Authorization'] = 'Basic {}'.format(token.decode('utf-8'))
 
-    connection.request('POST', '/salt/api/v2/jobs/upload',
-            json.dumps(report), headers)
+    connection.request('POST', '/salt/api/v2/jobs/upload', json.dumps(report), headers)
     response = connection.getresponse()
 
     if response.status == 200:
