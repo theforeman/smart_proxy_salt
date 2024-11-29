@@ -32,9 +32,13 @@ module Proxy
       def test_override_exit_status
         runner = SaltRunner.new({}, :suspended_action => nil)
         assert_nil runner.jid
-        assert_equal 1, runner.publish_exit_status(0)
+        runner.publish_exit_status(0)
+        updates = runner.generate_updates
+        assert_equal 1, updates[{:suspended_action => nil}].exit_status
         runner.publish_data('jid: 12345', 'stdout')
-        assert_equal 0, runner.publish_exit_status(0)
+        runner.publish_exit_status(0)
+        updates = runner.generate_updates
+        assert_equal 0, updates[{:suspended_action => nil}].exit_status
       end
 
       def test_generate_command
