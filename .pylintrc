@@ -1,0 +1,2 @@
+[MESSAGES CONTROL]
+disable=R,C,unspecified-encoding,broad-exception-caught,broad-exception-raised,protected-access
