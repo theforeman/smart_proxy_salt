@@ -34,11 +34,11 @@ module Proxy
         assert_nil runner.jid
         runner.publish_exit_status(0)
         updates = runner.generate_updates
-        assert_equal 1, updates[{:suspended_action => nil}].exit_status
+        assert_equal 1, updates[{ :suspended_action => nil }].exit_status
         runner.publish_data('jid: 12345', 'stdout')
         runner.publish_exit_status(0)
         updates = runner.generate_updates
-        assert_equal 0, updates[{:suspended_action => nil}].exit_status
+        assert_equal 0, updates[{ :suspended_action => nil }].exit_status
       end
 
       def test_generate_command
