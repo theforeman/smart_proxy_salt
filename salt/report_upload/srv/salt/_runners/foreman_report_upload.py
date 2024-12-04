@@ -11,7 +11,7 @@ LOCK_FILE = '/var/lock/salt-report-upload.lock'
 try:
     from http.client import HTTPConnection, HTTPSConnection
 except ImportError:
-    from httplib import HTTPSConnection, HTTPSConnection
+    from httplib import HTTPConnection, HTTPSConnection
 
 import io
 import ssl
