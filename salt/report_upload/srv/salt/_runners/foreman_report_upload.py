@@ -3,6 +3,7 @@
 Uploads reports from the Salt job cache to Foreman
 '''
 from __future__ import absolute_import, print_function, unicode_literals
+from builtins import str
 
 LAST_UPLOADED = '/etc/salt/last_uploaded'
 FOREMAN_CONFIG = '/etc/salt/foreman.yaml'
@@ -18,17 +19,12 @@ import ssl
 import json
 import yaml
 import os
-import sys
 import base64
 
 # Import python libs
 import logging
 
 log = logging.getLogger(__name__)
-
-
-if sys.version_info.major == 3:
-    unicode = str
 
 
 def salt_config():
@@ -39,7 +35,7 @@ def salt_config():
 
 def write_last_uploaded(last_uploaded):
     with io.open(LAST_UPLOADED, 'w+') as f:
-        f.write(unicode(last_uploaded))
+        f.write(str(last_uploaded))
 
 
 def upload(report):
@@ -131,4 +127,3 @@ def now(highstate):
         log.error('Exception encountered: %s', exc)
     finally:
         release_lock()
-
