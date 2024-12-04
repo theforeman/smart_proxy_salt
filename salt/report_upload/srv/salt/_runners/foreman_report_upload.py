@@ -51,7 +51,7 @@ def upload(report):
         ctx = ssl.create_default_context()
         ctx.load_cert_chain(certfile=config[':ssl_cert'], keyfile=config[':ssl_key'])
         if config[':ssl_ca']:
-          ctx.load_verify_locations(cafile=config[':ssl_ca'])
+            ctx.load_verify_locations(cafile=config[':ssl_ca'])
         connection = HTTPSConnection(config[':host'],
                 port=config[':port'], context=ctx)
     else:
