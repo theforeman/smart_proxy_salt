@@ -1,40 +1,31 @@
-# -*- coding: utf-8 -*-
 '''
 Uploads reports from the Salt job cache to Foreman
 '''
-from __future__ import absolute_import, print_function, unicode_literals
-from builtins import str
 
-LAST_UPLOADED = '/etc/salt/last_uploaded'
-FOREMAN_CONFIG = '/etc/salt/foreman.yaml'
-LOCK_FILE = '/var/lock/salt-report-upload.lock'
+from http.client import HTTPConnection, HTTPSConnection
 
-try:
-    from http.client import HTTPConnection, HTTPSConnection
-except ImportError:
-    from httplib import HTTPConnection, HTTPSConnection
-
-import io
 import ssl
 import json
 import yaml
 import os
 import base64
-
-# Import python libs
 import logging
+
+LAST_UPLOADED = '/etc/salt/last_uploaded'
+FOREMAN_CONFIG = '/etc/salt/foreman.yaml'
+LOCK_FILE = '/var/lock/salt-report-upload.lock'
 
 log = logging.getLogger(__name__)
 
 
 def salt_config():
-    with open(FOREMAN_CONFIG, 'r') as f:
+    with open(FOREMAN_CONFIG) as f:
         config = yaml.safe_load(f.read())
     return config
 
 
 def write_last_uploaded(last_uploaded):
-    with io.open(LAST_UPLOADED, 'w+') as f:
+    with open(LAST_UPLOADED, 'w+') as f:
         f.write(str(last_uploaded))
 
 
@@ -64,7 +55,7 @@ def upload(report):
 
     if response.status == 200:
         write_last_uploaded(report['job']['job_id'])
-        info_msg = 'Success {0}: {1}'.format(report['job']['job_id'], response.read())
+        info_msg = 'Success {}: {}'.format(report['job']['job_id'], response.read())
         log.info(info_msg)
     else:
         log.error("Unable to upload job - aborting report upload")
@@ -103,7 +94,7 @@ def get_lock():
     if os.path.isfile(LOCK_FILE):
         raise Exception("Unable to obtain lock.")
     else:
-        io.open(LOCK_FILE, 'w+').close()
+        open(LOCK_FILE, 'w+').close()
 
 
 def release_lock():

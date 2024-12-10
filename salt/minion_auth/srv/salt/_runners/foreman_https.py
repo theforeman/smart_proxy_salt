@@ -19,7 +19,7 @@ def salt_config():
     """
     Read the foreman configuratoin from FOREMAN_CONFIG
     """
-    with open(FOREMAN_CONFIG, 'r') as config_file:
+    with open(FOREMAN_CONFIG) as config_file:
         config = yaml.safe_load(config_file.read())
     return config
 
