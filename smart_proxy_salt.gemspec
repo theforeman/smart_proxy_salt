@@ -16,5 +16,6 @@ Gem::Specification.new do |s|
   s.homepage         = 'https://github.com/theforeman/smart_proxy_salt'
   s.license          = 'GPL-3.0-only'
   s.required_ruby_version = '>= 2.7', '< 4'
-  s.add_runtime_dependency('smart_proxy_dynflow', '~> 0.5', '>= 0.5.0')
+  s.add_runtime_dependency('smart_proxy_dynflow', '~> 0.8')
+  s.add_development_dependency('csv', '~> 3.1' )
 end
