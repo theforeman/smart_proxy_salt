@@ -16,4 +16,5 @@ group :test do
   gem 'smart_proxy', github: 'theforeman/smart-proxy', branch: ENV.fetch('SMART_PROXY_BRANCH', 'develop')
   gem 'test-unit', '~> 3'
   gem 'webmock', '~> 1'
+  gem 'csv', '~> 3.0'
 end
