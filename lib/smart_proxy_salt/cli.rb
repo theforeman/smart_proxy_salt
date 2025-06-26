@@ -105,6 +105,13 @@ module Proxy
           shell_command(cmd)
         end
 
+        def refresh_pillar(host)
+          find_salt_binaries
+          cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt, '--async', escape_for_shell(host), 'saltutil.refresh_pillar']
+          logger.info "Will run saltutil.refresh_pillar for #{host}. Full command: #{cmd.join(' ')}"
+          shell_command(cmd)
+        end
+
         def key_delete(host)
           find_salt_binaries
           cmd = [@sudo, '-u', Proxy::Salt::Plugin.settings.salt_command_user, @salt_key, '--yes', '-d', escape_for_shell(host)]
