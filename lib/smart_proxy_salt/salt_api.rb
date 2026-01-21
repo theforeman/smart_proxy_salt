@@ -90,6 +90,16 @@ module Proxy
         end
       end
 
+      post '/refresh_pillar/:host' do
+        content_type :json
+        begin
+          log_halt 500, "Failed pillar refresh for #{params[:host]}: Check Log files" unless (result = Proxy::Salt.refresh_pillar(params[:host]))
+          result
+        rescue Exception => e
+          log_halt 406, "Failed pillar refresh for #{params[:host]}: #{e}"
+        end
+      end
+
       delete '/key/:host' do
         content_type :json
         begin
