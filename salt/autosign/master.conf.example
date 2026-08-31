@@ -1,0 +1,2 @@
+autosign_file: /etc/salt/autosign.conf
+autosign_key_file: /var/lib/foreman-proxy/salt/grains/autosign_key

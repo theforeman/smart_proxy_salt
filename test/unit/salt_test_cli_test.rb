@@ -33,7 +33,7 @@ class SaltCLITest < Test::Unit::TestCase
     autosign_key_file.close
     @autosign_key_file_path = autosign_key_file.path
 
-    Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => true, :autosign_file => @autosign_file_path, :autosign_key_file => @autosign_key_file_path)
+    Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => false, :autosign_file => @autosign_file_path, :autosign_key_file => @autosign_key_file_path)
     Proxy::Salt::CLI.stubs(:which).with('sudo').returns('/bin/sudo')
     Proxy::Salt::CLI.stubs(:which).with('salt-key').returns('/bin/salt-key')
     Proxy::Salt::CLI.stubs(:which).with('salt').returns('/bin/salt')
@@ -108,7 +108,7 @@ class SaltCLITest < Test::Unit::TestCase
   end
 
   def test_autosign_access_to_non_existent_file
-    Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => true, :autosign_file => 'create_non_existent_file')
+    Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => false, :autosign_file => 'create_non_existent_file')
     post '/autosign/bdf9f052723195aa35f94a4bc5512fdc'
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
     File.open('create_non_existent_file') do |file|
@@ -118,7 +118,7 @@ class SaltCLITest < Test::Unit::TestCase
   end
 
   def test_autosign_access_to_uncreatable_file
-    Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => true, :autosign_file => '/cannot/create/file')
+    Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => false, :autosign_file => '/cannot/create/file')
     post '/autosign/bdf9f052723195aa35f94a4bc5512fdc'
     assert_equal(last_response.status, 406)
     assert_includes(last_response.body, 'Failed to create autosign for bdf9f052723195aa35f94a4bc5512fdc')
@@ -131,7 +131,7 @@ class SaltCLITest < Test::Unit::TestCase
   end
 
   def test_autosign_list_missing_file
-    Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => true, :autosign_file => 'doesnt_exist')
+    Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => false, :autosign_file => 'doesnt_exist')
     get '/autosign'
     assert_equal 406, last_response.status, "Last response should be 406 but is: #{last_response.status}"
   end
@@ -177,7 +177,7 @@ class SaltCLITest < Test::Unit::TestCase
   end
 
   def test_autosign_key_create_missing_file
-    Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => true, :autosign_key_file => 'create_me')
+    Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => false, :autosign_key_file => 'create_me')
     post '/autosign_key/lulz'
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
     assert_equal('{"message":"Added key successfully."}', last_response.body)
@@ -188,7 +188,7 @@ class SaltCLITest < Test::Unit::TestCase
   end
 
   def test_autosign_key_create_uncreatable_file
-    Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => true, :autosign_key_file => '/cannot/create/file')
+    Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => false, :autosign_key_file => '/cannot/create/file')
     post '/autosign_key/lulz'
     assert_equal(406, last_response.status)
     assert(last_response.body.include?('Failed to create autosign key lulz'))
@@ -211,7 +211,7 @@ class SaltCLITest < Test::Unit::TestCase
   end
 
   def test_autosign_key_delete_missing_file
-    Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => true, :autosign_key_file => 'create_me')
+    Proxy::Salt::Plugin.load_test_settings(:api_url => @salt_rest_api, :use_api => false, :autosign_key_file => 'create_me')
     delete '/autosign_key/lulz'
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
     assert_equal('{"message":"Removed key successfully."}', last_response.body)

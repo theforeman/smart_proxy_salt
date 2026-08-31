@@ -1,2 +1,7 @@
 [MESSAGES CONTROL]
 disable=R,C,unspecified-encoding,broad-exception-caught,broad-exception-raised,protected-access
+
+[VARIABLES]
+# Salt's loader injects these into runner/wheel/ext_pillar/master_tops/utils
+# modules at load time; they are not importable Python names.
+additional-builtins=__opts__,__utils__,__salt__,__pillar__,__grains__,__func_alias__,__virtualname__
