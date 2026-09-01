@@ -13,7 +13,8 @@ module Proxy
             :step_id => run_step_id,
             :uuid => execution_plan_id
           }
-          ::Proxy::Salt::SaltRunner.new(
+          runner_class = ::Proxy::Salt::Plugin.settings.use_api ? ::Proxy::Salt::SaltApiRunner : ::Proxy::Salt::SaltRunner
+          runner_class.new(
             input.merge(additional_options),
             suspended_action
           )

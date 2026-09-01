@@ -15,10 +15,15 @@ module Proxy
       attr_reader :url, :username, :password, :auth
 
       def initialize
-        @url = Proxy::Salt::Plugin.settings.api_url
-        @auth = Proxy::Salt::Plugin.settings.api_auth
-        @username = Proxy::Salt::Plugin.settings.api_username
-        @password = Proxy::Salt::Plugin.settings.api_password
+        s = Proxy::Salt::Plugin.settings
+        @url = s.api_url
+        @auth = s.api_auth
+        @username = s.api_username
+        @password = s.api_password
+        @ssl_cert = s.api_ssl_cert
+        @ssl_key = s.api_ssl_key
+        @ssl_ca = s.api_ssl_ca
+        @ssl_verify = s.api_ssl_verify
 
         begin
           URI.parse(url)
@@ -31,7 +36,18 @@ module Proxy
         uri              = URI.parse(url)
         http             = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl     = uri.scheme == 'https'
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        if http.use_ssl?
+          if @ssl_cert && @ssl_key
+            http.cert = OpenSSL::X509::Certificate.new(File.read(@ssl_cert))
+            http.key = OpenSSL::PKey.read(File.read(@ssl_key))
+          end
+          if @ssl_verify
+            http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+            http.ca_file = @ssl_ca if @ssl_ca
+          else
+            http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+          end
+        end
         path = [uri.path, path].join unless uri.path.empty?
 
         request = Net::HTTP::Post.new(URI.join(uri.to_s, path).path)

@@ -3,11 +3,15 @@
 :autosign_file: /etc/salt/autosign.conf
 :autosign_key_file: /var/lib/foreman-proxy/salt/grains/autosign_key
 :salt_command_user: root
-# Some features require using the Salt API - such as listing
-# environments and retrieving state info
+# Configure Salt API 
 :use_api: false
 :api_url: https://localhost:8080
 :api_auth: pam
 :api_username: saltuser
 :api_password: password
+# optional mTLS, requires Salt with saltstack/salt#69441
+# :api_ssl_cert: /etc/foreman-proxy/foreman_ssl_cert.pem
+# :api_ssl_key:  /etc/foreman-proxy/foreman_ssl_key.pem
+# :api_ssl_ca:   /etc/foreman-proxy/foreman_ssl_ca.pem
+# :api_ssl_verify: true
 # :saltfile: '/etc/foreman-proxy/settings.d/salt.saltfile'

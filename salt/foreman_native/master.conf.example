@@ -1,0 +1,34 @@
+foreman:
+  url: https://foreman.example.com
+  ssl_ca:   /etc/salt/pki/foreman/ca.pem
+  ssl_cert: /etc/salt/pki/foreman/client.pem
+  ssl_key:  /etc/salt/pki/foreman/client.key
+  # alternatively basic auth
+  # username: admin
+  # password: changeme
+  timeout: 10
+  cache_ttl: 10
+  # which state-jobs to upload to Foreman. Default: highstate only.
+  # Format: "<fun>" matches any args, "<fun> <arg-glob>" matches first arg.
+  # upload_states:
+  #   - state.highstate
+  #   - state.apply
+  #   - state.sls compliance*
+
+master_tops:
+  foreman: {}
+
+ext_pillar:
+  - foreman: {}
+
+publisher_acl:
+  foreman-proxy:
+    - state.template_str
+
+reactor:
+  - 'salt/auth':
+      - /var/lib/foreman-proxy/salt/reactors/foreman_minion_auth.sls
+      - /var/lib/foreman-proxy/salt/reactors/foreman_facts_sync.sls
+  - 'salt/job/*/ret/*':
+      - /var/lib/foreman-proxy/salt/reactors/foreman_facts_sync_highstate.sls
+      - /var/lib/foreman-proxy/salt/reactors/foreman_job_report.sls

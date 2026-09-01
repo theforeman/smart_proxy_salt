@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+ENV['RACK_ENV'] = 'test'
+
 require 'test/unit'
 $LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
 
