@@ -101,6 +101,39 @@ class SaltCLITest < Test::Unit::TestCase
     assert_equal(expected.to_json, last_response.body)
   end
 
+  def test_resolve_minion_id_preserves_exact_match
+    Proxy::Salt::CLI.expects(:key_list).returns('host.example.test' => { 'state' => 'accepted' })
+
+    assert_equal 'host.example.test', Proxy::Salt::CLI.resolve_minion_id('host.example.test')
+  end
+
+  def test_resolve_minion_id_uses_case_insensitive_match
+    Proxy::Salt::CLI.expects(:key_list).returns('Host.Example.Test' => { 'state' => 'accepted' })
+
+    assert_equal 'Host.Example.Test', Proxy::Salt::CLI.resolve_minion_id('host.example.test')
+  end
+
+  def test_resolve_minion_id_ignores_unaccepted_keys
+    Proxy::Salt::CLI.expects(:key_list).returns('Host.Example.Test' => { 'state' => 'unaccepted' })
+
+    assert_equal 'host.example.test', Proxy::Salt::CLI.resolve_minion_id('host.example.test')
+  end
+
+  def test_resolve_minion_id_keeps_ambiguous_target
+    Proxy::Salt::CLI.expects(:key_list).returns(
+      'Host.Example.Test' => { 'state' => 'accepted' },
+      'HOST.EXAMPLE.TEST' => { 'state' => 'accepted' }
+    )
+
+    assert_equal 'host.example.test', Proxy::Salt::CLI.resolve_minion_id('host.example.test')
+  end
+
+  def test_resolve_minion_id_keeps_target_when_key_list_fails
+    Proxy::Salt::CLI.expects(:key_list).raises('salt-key failed')
+
+    assert_equal 'host.example.test', Proxy::Salt::CLI.resolve_minion_id('host.example.test')
+  end
+
   def test_run_highstate
     Proxy::Salt::CLI.stubs(:shell_command).returns(true)
     post '/highstate/salt_host'
