@@ -47,7 +47,7 @@ module Proxy
         saltfile_path = ::Proxy::Salt::Plugin.settings[:saltfile]
         command = %w[sudo salt --show-jid]
         command << "--saltfile=#{saltfile_path}" if File.file?(saltfile_path)
-        command << @options['name']
+        command << ::Proxy::Salt.resolve_minion_id(@options['name'])
         command << 'state.template_str'
         command << @options['script']
         command

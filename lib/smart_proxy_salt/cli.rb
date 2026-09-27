@@ -149,6 +149,20 @@ module Proxy
           keys_hash
         end
 
+        def resolve_minion_id(host)
+          accepted_minions = key_list.select { |_minion, attributes| attributes['state'] == 'accepted' }.keys
+          return host if accepted_minions.include?(host)
+
+          matching_minions = accepted_minions.select { |minion| minion.casecmp?(host) }
+          return matching_minions.first if matching_minions.one?
+
+          logger.warn "Multiple accepted Salt minion IDs match '#{host}' case-insensitively" if matching_minions.length > 1
+          host
+        rescue StandardError => e
+          logger.warn "Unable to resolve Salt minion ID for '#{host}': #{e}"
+          host
+        end
+
         private
 
         def shell_command(cmd, wait = true)

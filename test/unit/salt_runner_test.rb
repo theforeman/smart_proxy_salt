@@ -47,7 +47,8 @@ module Proxy
         runner = SaltRunner.new({ 'name' => 'a-host', 'script' => 'ls -la /' },
                                 :suspended_action => nil)
         File.expects(:file?).with(saltfile).returns(true)
-        expected = %W[sudo salt --show-jid --saltfile=#{saltfile} a-host state.template_str] << 'ls -la /'
+        Proxy::Salt.expects(:resolve_minion_id).with('a-host').returns('A-Host')
+        expected = %W[sudo salt --show-jid --saltfile=#{saltfile} A-Host state.template_str] << 'ls -la /'
         assert_equal expected, runner.send(:generate_command)
       end
     end
